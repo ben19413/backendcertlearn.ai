@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from app.services.gemini import generate_questions
+from services.gemini import generate_questions
 
 router = APIRouter()
 

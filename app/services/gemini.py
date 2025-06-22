@@ -1,16 +1,17 @@
 import os
 import httpx
+from services.prompt import GEMINI_PROMPT_TEMPLATE
 
-GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent"
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+GEMINI_API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
+
 
 async def generate_questions(specification, example_questions, customer_id):
-    # Compose prompt using specification and examples
-    prompt = f"""
-You are to generate 30 questions based on the following specification: {specification}
-Here are some example questions: {example_questions}
-For each question, provide one correct answer and 30 other possible multiple choice answers in JSON format.
-"""
+    prompt = GEMINI_PROMPT_TEMPLATE.format(
+        specification=specification,
+        example_questions=example_questions,
+        customer_id=customer_id
+    )
     headers = {"Content-Type": "application/json"}
     params = {"key": GEMINI_API_KEY}
     data = {
