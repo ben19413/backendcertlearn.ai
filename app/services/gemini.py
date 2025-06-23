@@ -6,11 +6,13 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 GEMINI_API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
 
 
-async def generate_questions(specification, example_questions, customer_id):
+async def generate_questions(specification, example_questions, customer_id, num_questions=30, num_answers=30):
     prompt = GEMINI_PROMPT_TEMPLATE.format(
         specification=specification,
         example_questions=example_questions,
-        customer_id=customer_id
+        customer_id=customer_id,
+        num_questions=num_questions,
+        num_answers=num_answers
     )
     headers = {"Content-Type": "application/json"}
     params = {"key": GEMINI_API_KEY}
