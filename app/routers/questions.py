@@ -1,45 +1,68 @@
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, ValidationError
-from services.gemini import generate_questions
-import json
+from fastapi import APIRouter, HTTPException, Depends
+from fastapi.responses import JSONResponse
+from models import QuestionRequest, QuestionResponse, ErrorResponse
+from services import QuestionGeneratorService
 import logging
-import re
-from typing import Dict, List
 
-router = APIRouter()
+logger = logging.getLogger(__name__)
 
-class Question(BaseModel):
-    id: int
-    question: str
-    correct_answer: str
-    other_answers: Dict[str, str]
+router = APIRouter(prefix="/questions", tags=["questions"])
 
-class QuestionRequest(BaseModel):
-    specification: str
-    example_questions: List[str]
-    customer_id: str
-    num_questions: int = 10
-    num_answers: int = 10
+# Dependency injection for service
+def get_question_service() -> QuestionGeneratorService:
+    """Get question generator service instance."""
+    return QuestionGeneratorService()
 
-@router.post("/generate-questions")
-async def generate_questions_endpoint(request: QuestionRequest):
+
+@router.post(
+    "/generate",
+    response_model=QuestionResponse,
+    responses={
+        400: {"model": ErrorResponse},
+        422: {"model": ErrorResponse},
+        500: {"model": ErrorResponse}
+    },
+    summary="Generate multiple choice questions",
+    description="Generate multiple choice questions from provided text for specified exam type"
+)
+async def generate_questions(
+    request: QuestionRequest,
+    service: QuestionGeneratorService = Depends(get_question_service)
+) -> QuestionResponse:
+    """Generate multiple choice questions based on input text and exam type."""
     try:
-        gemini_response = await generate_questions(
-            request.specification,
-            request.example_questions,
-            request.customer_id,
-            request.num_questions,
-            request.num_answers
+        logger.info(f"Generating {request.num_questions} questions for {request.exam_type.value}")
+        
+        response = await service.generate_questions(request)
+        
+        logger.info(f"Successfully generated {response.total_questions} questions")
+        return response
+        
+    except ValueError as e:
+        logger.error(f"Validation error: {e}")
+        raise HTTPException(
+            status_code=400,
+            detail={"error": "Invalid input", "detail": str(e)}
         )
-        text = gemini_response["candidates"][0]["content"]["parts"][0]["text"]
-        # Remove markdown code block markers and 'json' prefix
-        cleaned = re.sub(r'^```json\s*|^```|```$', '', text.strip(), flags=re.MULTILINE)
-        try:
-            questions_raw = json.loads(cleaned)
-            questions = [Question(**q) for q in questions_raw]
-            return {"questions": [q.dict() for q in questions]}
-        except (Exception, ValidationError) as parse_error:
-            logging.error(f"Failed to parse or validate Gemini response as JSON. Cleaned text: {cleaned}")
-            return {"error": "Failed to parse or validate Gemini response as JSON.", "raw": cleaned}
+    except RuntimeError as e:
+        logger.error(f"Service error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail={"error": "Internal server error", "detail": str(e)}
+        )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Unexpected error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail={"error": "Unexpected error occurred", "detail": "Please try again later"}
+        )
+
+
+@router.get(
+    "/health",
+    summary="Health check endpoint",
+    description="Check if the questions service is healthy"
+)
+async def health_check():
+    """Health check endpoint for the questions service."""
+    return {"status": "healthy", "service": "questions"}
