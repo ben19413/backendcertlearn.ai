@@ -1,5 +1,5 @@
 from typing import Dict
-from models import ExamType
+from schemas import ExamType
 
 
 class PromptTemplates:

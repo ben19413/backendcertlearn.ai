@@ -5,7 +5,7 @@ from typing import Dict, Any, Optional
 from google import genai
 import os
 from pydantic import BaseModel
-from models import QuestionResponse, ExamType
+from schemas import QuestionResponse, ExamType
 from prompts import PromptTemplates
 
 

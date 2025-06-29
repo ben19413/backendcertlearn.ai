@@ -5,3 +5,6 @@ google-genai
 aiofiles
 python-multipart
 python-dotenv
+pyodbc
+sqlalchemy
+alembic

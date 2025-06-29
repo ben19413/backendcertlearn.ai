@@ -2,8 +2,13 @@ import asyncio
 from pathlib import Path
 from typing import Dict, Any
 import aiofiles
-from models import ExamType, QuestionRequest, QuestionResponse
+from models import QuestionDB
+from schemas import QuestionRequest, QuestionResponse, ErrorResponse, ExamType
 from gemini import GeminiClient
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from question_repository import QuestionRepository
+import os
 
 
 class QuestionGeneratorService:
@@ -26,6 +31,20 @@ class QuestionGeneratorService:
                 exam_type=request.exam_type,
                 exam_content=exam_content
             )
+            # Save each question to the DB
+            db = SessionLocal()
+            repo = QuestionRepository(db)
+            for q in response.questions:
+                repo.add_question(
+                    user_email="user@example.com",
+                    question=q.question,
+                    answer_1=q.answer_1,
+                    answer_2=q.answer_2,
+                    answer_3=q.answer_3,
+                    answer_4=q.answer_4,
+                    solution=q.solution
+                )
+            db.close()
             return response
         except Exception as e:
             raise RuntimeError(f"Failed to generate questions: {e}")
@@ -40,4 +59,23 @@ class QuestionGeneratorService:
             return ""
         except Exception as e:
             raise RuntimeError(f"Error loading content for {exam_type.value}: {e}")
+
+    def list_questions_for_user(self, user_email: str):
+        db = SessionLocal()
+        repo = QuestionRepository(db)
+        questions = repo.get_questions_by_user(user_email)
+        db.close()
+        return questions
+
+    def get_question_for_user(self, user_email: str, question_id: int):
+        db = SessionLocal()
+        repo = QuestionRepository(db)
+        question = repo.get_question_by_user_and_id(user_email, question_id)
+        db.close()
+        return question
+
+
+DATABASE_URL = os.getenv("DATABASE_URL", "mssql+pyodbc://sa:YourStrong!Passw0rd@mssql:1433/master?driver=ODBC+Driver+17+for+SQL+Server")
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

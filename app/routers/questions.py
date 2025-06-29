@@ -1,6 +1,6 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Query
 from fastapi.responses import JSONResponse
-from models import QuestionRequest, QuestionResponse, ErrorResponse
+from schemas import QuestionRequest, QuestionResponse, ErrorResponse, Question, ExamType
 from services import QuestionGeneratorService
 import logging
 
@@ -66,3 +66,19 @@ async def generate_questions(
 async def health_check():
     """Health check endpoint for the questions service."""
     return {"status": "healthy", "service": "questions"}
+
+
+@router.get("/list", response_model=list[Question])
+def list_questions(user_email: str = Query(...), service: QuestionGeneratorService = Depends(get_question_service)):
+    """List all questions for a specific user_email."""
+    questions = service.list_questions_for_user(user_email)
+    return questions
+
+
+@router.get("/get", response_model=Question)
+def get_question(user_email: str = Query(...), question_id: int = Query(...), service: QuestionGeneratorService = Depends(get_question_service)):
+    """Get a specific question by user_email and id."""
+    question = service.get_question_for_user(user_email, question_id)
+    if not question:
+        raise HTTPException(status_code=404, detail="Question not found")
+    return question
