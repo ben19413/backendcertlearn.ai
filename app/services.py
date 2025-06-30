@@ -3,11 +3,11 @@ from pathlib import Path
 from typing import Dict, Any
 import aiofiles
 from models import QuestionDB
-from schemas import QuestionRequest, QuestionResponse, ErrorResponse, ExamType
+from schemas import QuestionRequest, QuestionResponse, ErrorResponse, ExamType, QuestionLog
 from gemini import GeminiClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from question_repository import QuestionRepository
+from question_repository import QuestionRepository, QuestionLogRepository
 import os
 
 
@@ -89,6 +89,36 @@ class QuestionGeneratorService:
         question = repo.get_question_by_test_and_id(test_id, question_id)
         db.close()
         return question
+
+
+class QuestionLogService:
+    """Service class for handling question logging operations."""
+
+    def add_log(self, log: QuestionLog):
+        db = SessionLocal()
+        repo = QuestionLogRepository(db)
+        log_entry = repo.add_log(
+            question_id=log.question_id,
+            user_email=log.user_email,
+            selected_answer=log.selected_answer,
+            liked=log.liked
+        )
+        db.close()
+        return log_entry
+
+    def get_logs_for_question(self, question_id: int):
+        db = SessionLocal()
+        repo = QuestionLogRepository(db)
+        logs = repo.get_logs_for_question(question_id)
+        db.close()
+        return logs
+
+    def get_logs_for_user(self, user_email: str):
+        db = SessionLocal()
+        repo = QuestionLogRepository(db)
+        logs = repo.get_logs_for_user(user_email)
+        db.close()
+        return logs
 
 
 DATABASE_URL = os.getenv("DATABASE_URL", "mssql+pyodbc://sa:YourStrong!Passw0rd@mssql:1433/master?driver=ODBC+Driver+17+for+SQL+Server")

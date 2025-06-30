@@ -1,6 +1,7 @@
 from enum import Enum
 from typing import List, Optional
 from pydantic import BaseModel, Field, validator
+from datetime import datetime
 
 class ExamType(str, Enum):
     """Supported exam types with their identifiers."""
@@ -44,3 +45,10 @@ class QuestionResponse(BaseModel):
 class ErrorResponse(BaseModel):
     error: str = Field(..., description="Error message")
     detail: Optional[str] = Field(None, description="Additional error details")
+
+class QuestionLog(BaseModel):
+    question_id: int
+    user_email: str
+    selected_answer: int
+    liked: Optional[bool]
+    timestamp: Optional[datetime]
