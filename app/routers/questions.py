@@ -1,8 +1,12 @@
 from fastapi import APIRouter, HTTPException, Depends, Query
 from fastapi.responses import JSONResponse
 from schemas import QuestionRequest, QuestionResponse, ErrorResponse, Question, ExamType
-from services import QuestionGeneratorService
+from services import QuestionGeneratorService, SessionLocal
 import logging
+import uuid
+from sqlalchemy.orm import Session
+from models import QuestionDB
+import sqlalchemy as sa
 
 logger = logging.getLogger(__name__)
 
@@ -31,11 +35,16 @@ async def generate_questions(
 ) -> QuestionResponse:
     """Generate multiple choice questions based on input text and exam type."""
     try:
-        logger.info(f"Generating {request.num_questions} questions for {request.exam_type.value}")
-        
-        response = await service.generate_questions(request)
+        # Generate a new integer test_id (one greater than the current max)
+        db = SessionLocal()
+        max_test_id = db.query(sa.func.max(sa.cast(QuestionDB.test_id, sa.Integer))).scalar() or 0
+        test_id = max_test_id + 1
+        db.close()
+        logger.info(f"Generating {request.num_questions} questions for {request.exam_type.value} with test_id {test_id}")
+        response = await service.generate_questions(request, test_id=test_id)
         
         logger.info(f"Successfully generated {response.total_questions} questions")
+        response.test_id = test_id
         return response
         
     except ValueError as e:
@@ -69,16 +78,16 @@ async def health_check():
 
 
 @router.get("/list", response_model=list[Question])
-def list_questions(user_email: str = Query(...), service: QuestionGeneratorService = Depends(get_question_service)):
-    """List all questions for a specific user_email."""
-    questions = service.list_questions_for_user(user_email)
+def list_questions(test_id: str = Query(...), service: QuestionGeneratorService = Depends(get_question_service)):
+    """List all questions for a specific test_id."""
+    questions = service.list_questions_for_test(test_id)
     return questions
 
 
 @router.get("/get", response_model=Question)
-def get_question(user_email: str = Query(...), question_id: int = Query(...), service: QuestionGeneratorService = Depends(get_question_service)):
-    """Get a specific question by user_email and id."""
-    question = service.get_question_for_user(user_email, question_id)
+def get_question(test_id: str = Query(...), question_id: int = Query(...), service: QuestionGeneratorService = Depends(get_question_service)):
+    """Get a specific question by test_id and id."""
+    question = service.get_question_for_test(test_id, question_id)
     if not question:
         raise HTTPException(status_code=404, detail="Question not found")
     return question

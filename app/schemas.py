@@ -8,9 +8,10 @@ class ExamType(str, Enum):
 
 class QuestionRequest(BaseModel):
     """Request model for question generation."""
+    user_email: str = Field(..., description="User's email address")
+    exam_type: ExamType = Field(..., description="Type of exam for question formatting")
     text: str = Field(..., min_length=1, max_length=5000, description="Text to generate questions from")
     num_questions: int = Field(..., ge=1, le=20, description="Number of questions to generate")
-    exam_type: ExamType = Field(..., description="Type of exam for question formatting")
     @validator('text')
     def validate_text_content(cls, v: str) -> str:
         if not v.strip():
@@ -30,6 +31,7 @@ class Question(BaseModel):
     solution: int = Field(..., ge=1, le=4, description="Indicates which answer (1-4) is correct")
 
 class QuestionResponse(BaseModel):
+    test_id: int = Field(..., description="Unique integer identifier for the test session")
     questions: List[Question] = Field(..., description="Generated questions")
     exam_type: ExamType = Field(..., description="Exam type used for generation")
     total_questions: int = Field(..., description="Total number of questions generated")

@@ -19,7 +19,7 @@ class QuestionGeneratorService:
         self.data_dir = Path(data_dir)
         self.gemini_client = GeminiClient()
     
-    async def generate_questions(self, request: QuestionRequest) -> QuestionResponse:
+    async def generate_questions(self, request: QuestionRequest, test_id: str) -> QuestionResponse:
         """Generate questions based on the request parameters."""
         try:
             # Load exam content from a .txt file
@@ -36,7 +36,9 @@ class QuestionGeneratorService:
             repo = QuestionRepository(db)
             for q in response.questions:
                 repo.add_question(
-                    user_email="user@example.com",
+                    test_id=test_id,
+                    user_email=request.user_email,
+                    exam_type=request.exam_type.value,
                     question=q.question,
                     answer_1=q.answer_1,
                     answer_2=q.answer_2,
@@ -71,6 +73,20 @@ class QuestionGeneratorService:
         db = SessionLocal()
         repo = QuestionRepository(db)
         question = repo.get_question_by_user_and_id(user_email, question_id)
+        db.close()
+        return question
+
+    def list_questions_for_test(self, test_id: str):
+        db = SessionLocal()
+        repo = QuestionRepository(db)
+        questions = repo.get_questions_by_test(test_id)
+        db.close()
+        return questions
+
+    def get_question_for_test(self, test_id: str, question_id: int):
+        db = SessionLocal()
+        repo = QuestionRepository(db)
+        question = repo.get_question_by_test_and_id(test_id, question_id)
         db.close()
         return question
 
