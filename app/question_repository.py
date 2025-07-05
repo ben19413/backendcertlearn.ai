@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from models import QuestionDB, QuestionLogDB
+from models import QuestionDB, AnswerLogDB
 
 class QuestionRepository:
     def __init__(self, db_session: Session):
@@ -39,22 +39,22 @@ class QuestionRepository:
     def get_question_by_test_and_id(self, test_id: str, question_id: int):
         return self.db.query(QuestionDB).filter(QuestionDB.test_id == test_id, QuestionDB.id == question_id).first()
 
-class QuestionLogRepository:
+class AnswerLogRepository:
     def __init__(self, db_session: Session):
         self.db = db_session
 
-    def add_log(self, question_id: int, user_email: str, selected_answer: int, liked: bool = None):
-        log = QuestionLogDB(
+    def add_log(self, question_id: int, selected_answer: int):
+        log = AnswerLogDB(
             question_id=question_id,
-            user_email=user_email,
-            selected_answer=selected_answer,
-            liked=liked
+            selected_answer=selected_answer
         )
         self.db.add(log)
         self.db.commit()
         self.db.refresh(log)
         return log
 
+    def get_logs_for_question(self, question_id: int):
+        return self.db.query(AnswerLogDB).filter(AnswerLogDB.question_id == question_id).all()
     def get_logs_for_question(self, question_id: int):
         return self.db.query(QuestionLogDB).filter(QuestionLogDB.question_id == question_id).all()
 

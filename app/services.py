@@ -3,11 +3,12 @@ from pathlib import Path
 from typing import Dict, Any
 import aiofiles
 from models import QuestionDB
-from schemas import QuestionRequest, QuestionResponse, ErrorResponse, ExamType, QuestionLog
+from schemas import QuestionRequest, QuestionResponse, ErrorResponse, ExamType
+
 from gemini import GeminiClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from question_repository import QuestionRepository, QuestionLogRepository
+from question_repository import QuestionRepository, AnswerLogRepository
 import os
 
 
@@ -94,36 +95,36 @@ class QuestionGeneratorService:
 
 
 class QuestionLogService:
-    """Service class for handling question logging operations."""
+    """Service class for handling answer logging operations."""
 
-    def add_log(self, log: QuestionLog):
+    def add_log(self, log):
         db = SessionLocal()
-        repo = QuestionLogRepository(db)
+        repo = AnswerLogRepository(db)
         log_entry = repo.add_log(
             question_id=log.question_id,
-            user_email=log.user_email,
-            selected_answer=log.selected_answer,
-            liked=log.liked
+            selected_answer=log.selected_answer
         )
         db.close()
         return log_entry
 
     def get_logs_for_question(self, question_id: int):
         db = SessionLocal()
-        repo = QuestionLogRepository(db)
+        repo = AnswerLogRepository(db)
         logs = repo.get_logs_for_question(question_id)
         db.close()
         return logs
 
     def get_logs_for_user(self, user_email: str):
         db = SessionLocal()
-        repo = QuestionLogRepository(db)
+        repo = AnswerLogRepository(db)
         logs = repo.get_logs_for_user(user_email)
         db.close()
         return logs
 
 
 DATABASE_URL = os.getenv("DATABASE_URL", "mssql+pyodbc://sa:YourStrong!Passw0rd@mssql:1433/master?driver=ODBC+Driver+17+for+SQL+Server")
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

@@ -20,20 +20,24 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     op.create_table(
-        'question_logs',
+        'answer_logs',
         sa.Column('id', sa.Integer(), primary_key=True),
         sa.Column('question_id', sa.Integer(), sa.ForeignKey('questions.id'), nullable=False, index=True),
-        sa.Column('user_email', sa.String(length=255), nullable=False, index=True),
         sa.Column('selected_answer', sa.Integer(), nullable=False),
-        sa.Column('liked', sa.Boolean(), nullable=True),
         sa.Column('timestamp', sa.DateTime(), server_default=sa.func.now(), nullable=False),
     )
     # Add topic column to questions table
     op.add_column('questions', sa.Column('topic', sa.String(length=255), nullable=True))
 
 
-def downgrade() -> None:
-    op.drop_table('question_logs')
-    # Remove topic column from questions table
+# ...existing code...
+from sqlalchemy import inspect
+
+def downgrade():
+    bind = op.get_bind()
+    inspector = inspect(bind)
+    if 'answer_logs' in inspector.get_table_names():
+        op.drop_table('answer_logs')
+
     op.drop_column('questions', 'topic')
     # ### end Alembic commands ###
