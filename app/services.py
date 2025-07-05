@@ -19,14 +19,14 @@ class QuestionGeneratorService:
         self.data_dir = Path(data_dir)
         self.gemini_client = GeminiClient()
     
-    async def generate_questions(self, request: QuestionRequest, test_id: str) -> QuestionResponse:
+    async def generate_questions(self, request: QuestionRequest, test_id: str, ) -> QuestionResponse:
         """Generate questions based on the request parameters."""
         try:
             # Load exam content from a .txt file
             exam_content = await self._load_exam_content(request.exam_type)
-            # Generate questions using Gemini, passing user_info and exam_content
+            # Generate questions using Gemini, passing topic and exam_content
             response = await self.gemini_client.generate_questions_async(
-                user_info=request.text,
+                topic=request.topic,
                 num_questions=request.num_questions,
                 exam_type=request.exam_type,
                 exam_content=exam_content
@@ -39,6 +39,8 @@ class QuestionGeneratorService:
                     test_id=test_id,
                     user_email=request.user_email,
                     exam_type=request.exam_type.value,
+                    question_set_id=request.question_set_id,
+                    topic=request.topic,  # <-- Add this line
                     question=q.question,
                     answer_1=q.answer_1,
                     answer_2=q.answer_2,

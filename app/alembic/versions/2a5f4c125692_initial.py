@@ -25,6 +25,7 @@ def upgrade() -> None:
     sa.Column('test_id', sa.Integer(), nullable=False),
     sa.Column('user_email', sa.String(length=255), nullable=False),
     sa.Column('exam_type', sa.String(length=50), nullable=False),
+    sa.Column('question_set_id', sa.String(length=255), nullable=False),  # New column
     sa.Column('question', sa.String(), nullable=False),
     sa.Column('answer_1', sa.String(), nullable=False),
     sa.Column('answer_2', sa.String(), nullable=False),
@@ -35,6 +36,7 @@ def upgrade() -> None:
     )
     op.create_index(op.f('ix_questions_test_id'), 'questions', ['test_id'], unique=False)
     op.create_index(op.f('ix_questions_user_email'), 'questions', ['user_email'], unique=False)
+    op.create_index(op.f('ix_questions_question_set_id'), 'questions', ['question_set_id'], unique=False)  # Index for new column
     # ### end Alembic commands ###
 
 

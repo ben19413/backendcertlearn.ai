@@ -28,8 +28,12 @@ def upgrade() -> None:
         sa.Column('liked', sa.Boolean(), nullable=True),
         sa.Column('timestamp', sa.DateTime(), server_default=sa.func.now(), nullable=False),
     )
+    # Add topic column to questions table
+    op.add_column('questions', sa.Column('topic', sa.String(length=255), nullable=True))
 
 
 def downgrade() -> None:
     op.drop_table('question_logs')
+    # Remove topic column from questions table
+    op.drop_column('questions', 'topic')
     # ### end Alembic commands ###

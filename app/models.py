@@ -9,6 +9,8 @@ class QuestionDB(Base):
     test_id = Column(Integer, nullable=False, index=True)  # Unique identifier for a test session
     user_email = Column(String(255), nullable=False, index=True)
     exam_type = Column(String(50), nullable=False)  # Store exam type (e.g., CFA1)
+    question_set_id = Column(String(255), nullable=False, index=True)  # New column for question set id
+    topic = Column(String(255), nullable=True)  # <-- Add this line
     question = Column(String, nullable=False)
     answer_1 = Column(String, nullable=False)
     answer_2 = Column(String, nullable=False)

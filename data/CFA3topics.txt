@@ -1,0 +1,240 @@
+Quantitative Methods
+LEARNING OUTCOMES
+Rates and Returns
+The candidate should be able to:
+□ interpret interest rates as required rates of return, discount rates, or opportunity
+costs and explain an interest rate as the sum of a real risk-free rate and
+premiums that compensate investors for bearing distinct types of risk
+□ calculate and interpret different approaches to return measurement over time
+and describe their appropriate uses
+□ compare the money-weighted and time-weighted rates of return and evaluate
+the performance of portfolios based on these measures
+□ calculate and interpret annualized return measures and continuously
+compounded returns, and describe their appropriate uses
+□ calculate and interpret major return measures and describe their appropriate
+uses
+Time Value of Money in Finance
+The candidate should be able to:
+□ calculate and interpret the present value (PV) of fixed-income and equity
+instruments based on expected future cash flows
+□ calculate and interpret the implied return of fixed-income instruments and
+required return and implied growth of equity instruments given the present
+value (PV) and cash flows
+□ explain the cash flow additivity principle, its importance for the no-arbitrage
+condition, and its use in calculating implied forward interest rates, forward
+exchange rates, and option values
+2
+© CFA Institute. For candidate use only. Not for distribution.
+Quantitative Methods
+Statistical Measures of Asset Returns
+The candidate should be able to:
+□ calculate, interpret, and evaluate measures of central tendency and location to
+address an investment problem
+□ calculate, interpret, and evaluate measures of dispersion to address an
+investment problem
+□ interpret and evaluate measures of skewness and kurtosis to address an
+investment problem
+□ interpret correlation between two variables to address an investment problem
+Probability Trees and Conditional Expectations
+The candidate should be able to:
+□ calculate expected values, variances, and standard deviations and demonstrate
+their application to investment problems
+□ formulate an investment problem as a probability tree and explain the use of
+conditional expectations in investment application
+□ calculate and interpret an updated probability in an investment setting using
+Bayes’ formula
+Portfolio Mathematics
+The candidate should be able to:
+□ calculate and interpret the expected value, variance, standard deviation,
+covariances, and correlations of portfolio returns
+□ calculate and interpret the covariance and correlation of portfolio returns using
+a joint probability function for returns
+□ define shortfall risk, calculate the safety-first ratio, and identify an optimal
+portfolio using Roy’s safety-first criterion
+Simulation Methods
+The candidate should be able to:
+□ explain the relationship between normal and lognormal distributions and
+why the lognormal distribution is used to model asset prices when using
+continuously compounded asset returns
+□ describe Monte Carlo simulation and explain how it can be used in investment
+applications
+□ describe the use of bootstrap resampling in conducting a simulation based on
+observed data in investment applications
+Estimation and Inference
+The candidate should be able to:
+□ compare and contrast simple random, stratified random, cluster, convenience,
+and judgmental sampling and their implications for sampling error in an
+investment problem
+□ explain the central limit theorem and its importance for the distribution and
+standard error of the sample mean
+□ describe the use of resampling (bootstrap, jackknife) to estimate the sampling
+distribution of a statistic
+© CFA Institute. For candidate use only. Not for distribution.
+Quantitative Methods
+Hypothesis Testing
+The candidate should be able to:
+□ explain hypothesis testing and its components, including statistical significance,
+Type I and Type II errors, and the power of a test
+□ construct hypothesis tests and determine their statistical significance, the
+associated Type I and Type II errors, and power of the test given a significance
+level
+□ compare and contrast parametric and nonparametric tests, and describe
+situations where each is the more appropriate type of test
+Parametric and Non-Parametric Tests of Independence
+The candidate should be able to:
+□ explain parametric and nonparametric tests of the hypothesis that the
+population correlation coefficient equals zero, and determine whether the
+hypothesis is rejected at a given level of significance
+□ explain tests of independence based on contingency table data
+Simple Linear Regression
+The candidate should be able to:
+□ describe a simple linear regression model, how the least squares criterion is used
+to estimate regression coefficients, and the interpretation of these coefficients
+□ explain the assumptions underlying the simple linear regression model, and
+describe how residuals and residual plots indicate if these assumptions may have
+been violated
+□ calculate and interpret measures of fit and formulate and evaluate tests of fit and
+of regression coefficients in a simple linear regression
+□ describe the use of analysis of variance (ANOVA) in regression analysis,
+interpret ANOVA results, and calculate and interpret the standard error of
+estimate in a simple linear regression
+□ calculate and interpret the predicted value for the dependent variable, and a
+prediction interval for it, given an estimated linear regression model and a value
+for the independent variable
+□ describe different functional forms of simple linear regressions
+Introduction to Big Data Techniques
+The candidate should be able to:
+□ describe aspects of “fintech” that are directly relevant for the gathering and
+analyzing of financial data
+□ describe Big Data, artificial intelligence, and machine learning
+□ describe applications of Big Data and Data Science to investment management
+3
+© CFA Institute. For candidate use only. Not for distribution.
+Economics
+LEARNING OUTCOMES
+The Firm and Market Structures
+The candidate should be able to:
+□ determine and interpret breakeven and shutdown points of production, as well
+as how economies and diseconomies of scale affect costs under perfect and
+imperfect competition
+□ describe characteristics of perfect competition, monopolistic competition,
+oligopoly, and pure monopoly
+□ explain supply and demand relationships under monopolistic competition,
+including the optimal price and output for firms as well as pricing strategy
+□ explain supply and demand relationships under oligopoly, including the optimal
+price and output for firms as well as pricing strategy
+□ identify the type of market structure within which a firm operates and describe
+the use and limitations of concentration measures
+Understanding Business Cycles
+The candidate should be able to:
+□ describe the business cycle and its phases
+□ describe credit cycles
+□ describe how resource use, consumer and business activity, housing sector
+activity, and external trade sector activity vary over the business cycle and
+describe their measurement using economic indicators
+© CFA Institute. For candidate use only. Not for distribution.
+Economics
+Fiscal Policy
+The candidate should be able to:
+□ compare monetary and fiscal policy
+□ describe roles and objectives of fiscal policy as well as arguments as to whether
+the size of a national debt relative to GDP matters
+□ describe tools of fiscal policy, including their advantages and disadvantages
+□ explain the implementation of fiscal policy and difficulties of implementation as
+well as whether a fiscal policy is expansionary or contractionary
+Monetary Policy
+The candidate should be able to:
+□ describe the roles and objectives of central banks
+□ describe tools used to implement monetary policy tools and the monetary
+transmission mechanism, and explain the relationships between monetary policy
+and economic growth, inflation, interest, and exchange rates
+□ describe qualities of effective central banks; contrast their use of inflation,
+interest rate, and exchange rate targeting in expansionary or contractionary
+monetary policy; and describe the limitations of monetary policy
+□ explain the interaction of monetary and fiscal policy
+Introduction to Geopolitics
+The candidate should be able to:
+□ describe geopolitics from a cooperation versus competition perspective
+□ describe geopolitics and its relationship with globalization
+□ describe functions and objectives of the international organizations that
+facilitate trade, including the World Bank, the International Monetary Fund, and
+the World Trade Organization
+□ describe geopolitical risk
+□ describe tools of geopolitics and their impact on regions and economies
+□ describe the impact of geopolitical risk on investments
+International Trade
+The candidate should be able to:
+□ describe the benefits and costs of international trade
+□ compare types of trade restrictions, such as tariffs, quotas, and export subsidies,
+and their economic implications
+□ explain motivations for and advantages of trading blocs, common markets, and
+economic unions
+Capital Flows and the FX Market
+The candidate should be able to:
+□ describe the foreign exchange market, including its functions and participants,
+distinguish between nominal and real exchange rates, and calculate and interpret
+the percentage change in a currency relative to another currency
+□ describe exchange rate regimes and explain the effects of exchange rates on
+countries’ international trade and capital flows
+□ describe common objectives of capital restrictions imposed by governments
+5
+6
+© CFA Institute. For candidate use only. Not for distribution.
+Economics
+Exchange Rate Calculations
+The candidate should be able to:
+□ calculate and interpret currency cross-rates
+□ explain the arbitrage relationship between spot and forward exchange rates and
+interest rates, calculate a forward rate using points or in percentage terms, and
+interpret a forward discount or premium
+© CFA Institute. For candidate use only. Not for distribution.
+Corporate Issuers
+LEARNING OUTCOMES
+Organizational Forms, Corporate Issuer Features, and Ownership
+The candidate should be able to:
+□ compare the organizational forms of businesses
+□ describe key features of corporate issuers
+□ compare publicly and privately owned corporate issuers
+Investors and Other Stakeholders
+The candidate should be able to:
+□ compare the financial claims and motivations of lenders and shareholders
+□ describe a company’s stakeholder groups and compare their interests
+□ describe environmental, social, and governance factors of corporate issuers
+considered by investors
+Corporate Governance: Conflicts, Mechanisms, Risks, and Benefits
+The candidate should be able to:
+□ describe the principal-agent relationship and conflicts that may arise between
+stakeholder groups
+□ describe corporate governance and mechanisms to manage stakeholder
+relationships and mitigate associated risks
+□ describe potential risks of poor corporate governance and stakeholder
+management and benefits of effective corporate governance and stakeholder
+management
+8
+© CFA Institute. For candidate use only. Not for distribution.
+Corporate Issuers
+Working Capital and Liquidity
+The candidate should be able to:
+□ explain the cash conversion cycle and compare issuers’ cash conversion cycles
+□ explain liquidity and compare issuers’ liquidity levels
+□ describe issuers’ objectives and compare methods for managing working capital
+and liquidity
+Capital Investments and Capital Allocation
+The candidate should be able to:
+□ describe types of capital investments
+□ describe the capital allocation process, calculate net present value (NPV),
+internal rate of return (IRR), and return on invested capital (ROIC), and contrast
+their use in capital allocation
+□ describe principles of capital allocation and common capital allocation pitfalls
+□ describe types of real options relevant to capital investments
+Capital Structure
+The candidate should be able to:
+□ calculate and interpret the weighted-average cost of capital for a company
+□ explain factors affecting capital structure and the weighted-average cost of
+capital
+□ explain the Modigliani–Miller propositions regarding capital structure
+□ describe optimal and target capital structures
+Business Models
+The candidate should be able to:
+□ describe key features of business models
+□ describe various types of business models
