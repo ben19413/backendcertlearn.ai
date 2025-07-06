@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends, Query
 from fastapi.responses import JSONResponse
-from schemas import QuestionRequest, QuestionResponse, ErrorResponse, Question, ExamType, AnswerLog
-from services import QuestionGeneratorService, SessionLocal, QuestionLogService
+from schemas import QuestionRequest, QuestionResponse, ErrorResponse, Question, ExamType, AnswerLog, OpinionLog
+from services import QuestionGeneratorService, SessionLocal, QuestionLogService, OpinionLogService
 import logging
 import uuid
 from sqlalchemy.orm import Session
@@ -18,6 +18,7 @@ def get_question_service() -> QuestionGeneratorService:
     return QuestionGeneratorService()
 
 log_service = QuestionLogService()
+opinion_service = OpinionLogService()
 
 
 @router.post(
@@ -112,3 +113,11 @@ def get_logs_for_question(question_id: int):
 def get_logs_for_user(user_email: str):
     """Get all logs for a specific user."""
     return log_service.get_logs_for_user(user_email)
+
+@router.post("/opinion", response_model=OpinionLog)
+def log_opinion(log: OpinionLog):
+    """Log an up/down opinion for a question."""
+    try:
+        return opinion_service.add_opinion(log)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
