@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from models import QuestionDB, AnswerLogDB
+from models import QuestionDB, AnswerLogDB, OpinionLogDB
 
 class QuestionRepository:
     def __init__(self, db_session: Session):
@@ -60,3 +60,17 @@ class AnswerLogRepository:
 
     def get_logs_for_user(self, user_email: str):
         return self.db.query(QuestionLogDB).filter(QuestionLogDB.user_email == user_email).all()
+
+class OpinionLogRepository:
+    def __init__(self, db_session: Session):
+        self.db = db_session
+
+    def add_opinion(self, question_id: int, up: bool):
+        log = OpinionLogDB(
+            question_id=question_id,
+            up=up
+        )
+        self.db.add(log)
+        self.db.commit()
+        self.db.refresh(log)
+        return log

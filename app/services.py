@@ -8,7 +8,7 @@ from schemas import QuestionRequest, QuestionResponse, ErrorResponse, ExamType
 from gemini import GeminiClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from question_repository import QuestionRepository, AnswerLogRepository
+from question_repository import QuestionRepository, AnswerLogRepository, OpinionLogRepository
 import os
 
 
@@ -120,6 +120,20 @@ class QuestionLogService:
         logs = repo.get_logs_for_user(user_email)
         db.close()
         return logs
+
+
+class OpinionLogService:
+    """Service class for handling opinion logging operations."""
+
+    def add_opinion(self, log):
+        db = SessionLocal()
+        repo = OpinionLogRepository(db)
+        log_entry = repo.add_opinion(
+            question_id=log.question_id,
+            up=log.up
+        )
+        db.close()
+        return log_entry
 
 
 DATABASE_URL = os.getenv("DATABASE_URL", "mssql+pyodbc://sa:YourStrong!Passw0rd@mssql:1433/master?driver=ODBC+Driver+17+for+SQL+Server")

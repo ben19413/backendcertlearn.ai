@@ -28,16 +28,17 @@ def upgrade() -> None:
     )
     # Add topic column to questions table
     op.add_column('questions', sa.Column('topic', sa.String(length=255), nullable=True))
-
-
-# ...existing code...
-from sqlalchemy import inspect
+    # Add opinion_logs table
+    op.create_table(
+        'opinion_logs',
+        sa.Column('id', sa.Integer(), primary_key=True),
+        sa.Column('question_id', sa.Integer(), sa.ForeignKey('questions.id'), nullable=False, index=True),
+        sa.Column('up', sa.Boolean(), nullable=False),
+        sa.Column('timestamp', sa.DateTime(), server_default=sa.func.now(), nullable=False),
+    )
 
 def downgrade():
-    bind = op.get_bind()
-    inspector = inspect(bind)
-    if 'answer_logs' in inspector.get_table_names():
-        op.drop_table('answer_logs')
-
+    op.drop_table('opinion_logs')
+    op.drop_table('answer_logs')
     op.drop_column('questions', 'topic')
-    # ### end Alembic commands ###
+
