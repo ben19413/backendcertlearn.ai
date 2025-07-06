@@ -21,14 +21,14 @@ class GeminiClient:
 
     async def generate_questions_async(
         self, 
-        user_info: str, 
+        topic: str, 
         num_questions: int, 
         exam_type: ExamType,
         exam_content: str
     ) -> QuestionResponse:
         """Generate questions asynchronously with structured output."""
-        # Compose the prompt using user_info and exam_content
-        prompt = PromptTemplates.get_full_prompt(exam_type, user_info, num_questions, exam_content)
+        # Compose the prompt using topic and exam_content
+        prompt = PromptTemplates.get_full_prompt(exam_type, topic, num_questions, exam_content)
         #print(prompt)
         loop = asyncio.get_event_loop()
         response = await loop.run_in_executor(
