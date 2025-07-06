@@ -20,7 +20,7 @@ class QuestionGeneratorService:
         self.data_dir = Path(data_dir)
         self.gemini_client = GeminiClient()
     
-    async def generate_questions(self, request: QuestionRequest, test_id: str, ) -> QuestionResponse:
+    async def generate_questions(self, request: QuestionRequest, test_id: str) -> QuestionResponse:
         """Generate questions based on the request parameters."""
         try:
             # Load exam content from a .txt file
