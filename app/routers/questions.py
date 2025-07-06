@@ -117,7 +117,4 @@ def get_logs_for_user(user_email: str):
 @router.post("/opinion", response_model=OpinionLog)
 def log_opinion(log: OpinionLog):
     """Log an up/down opinion for a question."""
-    try:
-        return opinion_service.add_opinion(log)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    return opinion_service.add_opinion(log)

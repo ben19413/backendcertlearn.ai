@@ -37,16 +37,8 @@ def upgrade() -> None:
         sa.Column('timestamp', sa.DateTime(), server_default=sa.func.now(), nullable=False),
     )
 
-
-from sqlalchemy import inspect
-
 def downgrade():
-    bind = op.get_bind()
-    inspector = inspect(bind)
-    if 'opinion_logs' in inspector.get_table_names():
-        op.drop_table('opinion_logs')
-    if 'answer_logs' in inspector.get_table_names():
-        op.drop_table('answer_logs')
-
+    op.drop_table('opinion_logs')
+    op.drop_table('answer_logs')
     op.drop_column('questions', 'topic')
-    # ### end Alembic commands ###
+
