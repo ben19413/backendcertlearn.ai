@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends, Query
 from fastapi.responses import JSONResponse
-from schemas import QuestionRequest, QuestionResponse, ErrorResponse, Question, ExamType, QuestionLog
-from services import QuestionGeneratorService, SessionLocal, QuestionLogService
+from schemas import QuestionRequest, QuestionResponse, ErrorResponse, Question, ExamType, AnswerLog, OpinionLog
+from services import QuestionGeneratorService, SessionLocal, QuestionLogService, OpinionLogService
 import logging
 import uuid
 from sqlalchemy.orm import Session
@@ -18,6 +18,7 @@ def get_question_service() -> QuestionGeneratorService:
     return QuestionGeneratorService()
 
 log_service = QuestionLogService()
+opinion_service = OpinionLogService()
 
 
 @router.post(
@@ -95,17 +96,25 @@ def get_question(test_id: str = Query(...), question_id: int = Query(...), servi
     return question
 
 
-@router.post("/log", response_model=QuestionLog)
-def log_question_answer(log: QuestionLog):
-    """Log a student's answer and up/downvote for a question."""
-    return log_service.add_log(log)
+@router.post("/log", response_model=AnswerLog)
+def log_question_answer(log: AnswerLog):
+    """Log a student's answer for a question."""
+    try:
+        return log_service.add_log(log)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
-@router.get("/logs/question/{question_id}", response_model=list[QuestionLog])
+@router.get("/logs/question/{question_id}", response_model=list[AnswerLog])
 def get_logs_for_question(question_id: int):
     """Get all logs for a specific question."""
     return log_service.get_logs_for_question(question_id)
 
-@router.get("/logs/user/{user_email}", response_model=list[QuestionLog])
+@router.get("/logs/user/{user_email}", response_model=list[AnswerLog])
 def get_logs_for_user(user_email: str):
     """Get all logs for a specific user."""
     return log_service.get_logs_for_user(user_email)
+
+@router.post("/opinion", response_model=OpinionLog)
+def log_opinion(log: OpinionLog):
+    """Log an up/down opinion for a question."""
+    return opinion_service.add_opinion(log)

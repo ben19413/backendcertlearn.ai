@@ -18,12 +18,17 @@ class QuestionDB(Base):
     answer_4 = Column(String, nullable=False)
     solution = Column(Integer, nullable=False)
 
-class QuestionLogDB(Base):
-    __tablename__ = "question_logs"
+class AnswerLogDB(Base):
+    __tablename__ = "answer_logs"
     id = Column(Integer, primary_key=True)
     question_id = Column(Integer, ForeignKey("questions.id"), nullable=False, index=True)
-    user_email = Column(String(255), nullable=False, index=True)
     selected_answer = Column(Integer, nullable=False)
-    liked = Column(Boolean, nullable=True) 
+    timestamp = Column(DateTime, server_default=func.now(), nullable=False)
+
+class OpinionLogDB(Base):
+    __tablename__ = "opinion_logs"
+    id = Column(Integer, primary_key=True)
+    question_id = Column(Integer, ForeignKey("questions.id"), nullable=False, index=True)
+    up = Column(Boolean, nullable=False) 
     timestamp = Column(DateTime, server_default=func.now(), nullable=False)
 

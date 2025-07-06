@@ -38,13 +38,14 @@ class ErrorResponse(BaseModel):
     error: str = Field(..., description="Error message")
     detail: Optional[str] = Field(None, description="Additional error details")
 
-class QuestionLog(BaseModel):
+class AnswerLog(BaseModel):
+    id: Optional[int]
     question_id: int
-    user_email: str
     selected_answer: int
-    liked: Optional[bool]
-    timestamp: Optional[datetime]
-    user_email: str
-    selected_answer: int
-    liked: Optional[bool]
-    timestamp: Optional[datetime]
+    timestamp: datetime
+
+class OpinionLog(BaseModel):
+    id: Optional[int]
+    question_id: int
+    up: bool
+    timestamp: datetime
