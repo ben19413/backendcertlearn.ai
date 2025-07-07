@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, func
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, func,UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -32,3 +32,16 @@ class OpinionLogDB(Base):
     up = Column(Boolean, nullable=False) 
     timestamp = Column(DateTime, server_default=func.now(), nullable=False)
 
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String)
+    password = Column(String, nullable=True)
+    provider = Column(String, default="local", nullable=True)
+    fullname = Column(String, nullable=True)
+    register_date = Column(DateTime, default=func.now())
+    __table_args__ = (UniqueConstraint('username', 'provider', name='unique_username_per_provider'),)
+
+    @property
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
