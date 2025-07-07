@@ -51,3 +51,6 @@ class OpinionLog(BaseModel):
     up: bool
     user_email: str
     timestamp: datetime
+
+class InProgressSetsResponse(BaseModel):
+    in_progress_sets: List[str]
