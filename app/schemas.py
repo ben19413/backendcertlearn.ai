@@ -25,11 +25,10 @@ class CFA1Topic(str, Enum):
 
 class QuestionRequest(BaseModel):
     """Request model for question generation."""
-    user_email: str = Field(..., description="User's email address")
     exam_type: ExamType = Field(default=ExamType.CFA3topics, description="Type of exam for question formatting")
-    topic: CFA1Topic = Field(..., description="Topic to generate questions about (also used as the PDF filename, e.g. /data/CFA1/{topic}.pdf)")
-    num_questions: int = Field(..., ge=1, le=20, description="Number of questions to generate")
-    question_set_id: str = Field(..., description="Unique identifier for the question set")
+    topics: list[CFA1Topic] = Field(..., description="List of topics to generate questions about (used as PDF filenames, e.g. /data/CFA1/{topic}.pdf)")
+    num_questions: int = Field(..., ge=1, le=20, description="Number of questions to generate per topic")
+    question_set_id: str = Field(None, description="Unique identifier for the question set (optional, will be generated if not provided)")
 
 class Choice(BaseModel):
     label: str = Field(..., description="Choice label (A, B, C, or D)")

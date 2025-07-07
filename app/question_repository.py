@@ -5,13 +5,12 @@ class QuestionRepository:
     def __init__(self, db_session: Session):
         self.db = db_session
 
-    def add_question(self, test_id: str, user_email: str, exam_type: str, question_set_id: str, topic: str, question: str, answer_1: str, answer_2: str, answer_3: str, answer_4: str, solution: int):
+    def add_question(self, test_id: str, exam_type: str, question_set_id: str, topic: str, question: str, answer_1: str, answer_2: str, answer_3: str, answer_4: str, solution: int):
         db_question = QuestionDB(
             test_id=test_id,
-            user_email=user_email,
             exam_type=exam_type,
             question_set_id=question_set_id,
-            topic=topic,  # <-- Add this line
+            topic=topic,
             question=question,
             answer_1=answer_1,
             answer_2=answer_2,
@@ -24,14 +23,8 @@ class QuestionRepository:
         self.db.refresh(db_question)
         return db_question
 
-    def get_questions_by_user(self, user_email: str):
-        return self.db.query(QuestionDB).filter(QuestionDB.user_email == user_email).all()
-
     def get_all_questions(self):
         return self.db.query(QuestionDB).all()
-
-    def get_question_by_user_and_id(self, user_email: str, question_id: int):
-        return self.db.query(QuestionDB).filter(QuestionDB.user_email == user_email, QuestionDB.id == question_id).first()
 
     def get_questions_by_test(self, test_id: str):
         return self.db.query(QuestionDB).filter(QuestionDB.test_id == test_id).all()
