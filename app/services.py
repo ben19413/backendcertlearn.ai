@@ -3,8 +3,7 @@ from pathlib import Path
 from typing import Dict, Any
 import aiofiles
 from models import QuestionDB
-from schemas import QuestionRequest, QuestionResponse, ErrorResponse, ExamType
-
+from schemas import QuestionRequest, QuestionResponse, ErrorResponse, ExamType, InProgressSetsResponse
 from gemini import GeminiClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -127,6 +126,31 @@ class QuestionGeneratorService:
                 total_questions=len(pydantic_questions)
             )
             return response
+        finally:
+            db.close()
+
+    def get_in_progress_question_sets_for_user(self, user_email: str) -> InProgressSetsResponse:
+        db = SessionLocal()
+        try:
+            from models import AnswerLogDB
+            set_ids = db.query(QuestionDB.question_set_id).distinct().all()
+            set_ids = [row[0] for row in set_ids]
+            in_progress_sets = []
+            for question_set_id in set_ids:
+                questions = db.query(QuestionDB).filter(QuestionDB.question_set_id == question_set_id).all()
+                question_ids = [q.id for q in questions]
+                total_questions = len(question_ids)
+                if total_questions == 0:
+                    continue
+                # Count how many of these questions have been answered by the user
+                answered_count = db.query(AnswerLogDB).filter(
+                    AnswerLogDB.user_email == user_email,
+                    AnswerLogDB.question_id.in_(question_ids)
+                ).distinct(AnswerLogDB.question_id).count()
+                # Only in progress if at least one answered and not all answered
+                if answered_count > 0 and answered_count < total_questions:
+                    in_progress_sets.append(question_set_id)
+            return InProgressSetsResponse(in_progress_sets=in_progress_sets)
         finally:
             db.close()
 

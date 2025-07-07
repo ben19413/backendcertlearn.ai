@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends, Query
 from fastapi.responses import JSONResponse
 from schemas import QuestionRequest, QuestionResponse, ErrorResponse, Question, ExamType, AnswerLog, OpinionLog
-from services import QuestionGeneratorService, SessionLocal, QuestionLogService, OpinionLogService
+from services import QuestionGeneratorService, SessionLocal, QuestionLogService, OpinionLogService, InProgressSetsResponse
 import logging
 import uuid
 from sqlalchemy.orm import Session
@@ -135,3 +135,20 @@ def list_unseen_questions(
 ):
     """List all unseen questions for a user in a question set."""
     return service.get_unseen_questions_for_user_and_set(user_email, question_set_id)
+
+
+@router.get(
+    "/in_progress",
+    response_model=InProgressSetsResponse,
+    summary="Check all question sets in progress for a user",
+    description="Returns {'in_progress_sets': [question_set_id, ...]} for sets started but not finished by the user"
+)
+def list_in_progress_question_sets(
+    user_email: str = Query(..., description="User's email address"),
+    service: QuestionGeneratorService = Depends(get_question_service)
+):
+    """
+    Check all question sets for which the user has started but not finished answering questions.
+    Returns a list of question_set_id values that are in progress.
+    """
+    return service.get_in_progress_question_sets_for_user(user_email)
