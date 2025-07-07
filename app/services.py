@@ -93,6 +93,43 @@ class QuestionGeneratorService:
         db.close()
         return question
 
+    def get_unseen_questions_for_user_and_set(self, user_email: str, question_set_id: str):
+        db = SessionLocal()
+        try:
+            questions = db.query(QuestionDB).filter(QuestionDB.question_set_id == question_set_id).all()
+            question_ids = [q.id for q in questions]
+            from models import AnswerLogDB
+            seen_logs = db.query(AnswerLogDB.question_id).filter(
+                AnswerLogDB.user_email == user_email,
+                AnswerLogDB.question_id.in_(question_ids)
+            ).distinct().all()
+            seen_ids = {row[0] for row in seen_logs}
+            unseen_questions = [q for q in questions if q.id not in seen_ids]
+            if questions:
+                exam_type = questions[0].exam_type
+            else:
+                exam_type = None
+            from schemas import Question, ExamType, QuestionResponse
+            pydantic_questions = [
+                Question(
+                    question=q.question,
+                    answer_1=q.answer_1,
+                    answer_2=q.answer_2,
+                    answer_3=q.answer_3,
+                    answer_4=q.answer_4,
+                    solution=q.solution
+                ) for q in unseen_questions
+            ]
+            response = QuestionResponse(
+                test_id=0,
+                questions=pydantic_questions,
+                exam_type=ExamType(exam_type) if exam_type else ExamType.CFA3topics,
+                total_questions=len(pydantic_questions)
+            )
+            return response
+        finally:
+            db.close()
+
 
 class QuestionLogService:
     """Service class for handling answer logging operations."""
@@ -102,7 +139,8 @@ class QuestionLogService:
         repo = AnswerLogRepository(db)
         log_entry = repo.add_log(
             question_id=log.question_id,
-            selected_answer=log.selected_answer
+            selected_answer=log.selected_answer,
+            user_email=log.user_email
         )
         db.close()
         return log_entry
@@ -130,7 +168,8 @@ class OpinionLogService:
         repo = OpinionLogRepository(db)
         log_entry = repo.add_opinion(
             question_id=log.question_id,
-            up=log.up
+            up=log.up,
+            user_email=log.user_email
         )
         db.close()
         return log_entry

@@ -24,6 +24,7 @@ def upgrade() -> None:
         sa.Column('id', sa.Integer(), primary_key=True),
         sa.Column('question_id', sa.Integer(), sa.ForeignKey('questions.id'), nullable=False, index=True),
         sa.Column('selected_answer', sa.Integer(), nullable=False),
+        sa.Column('user_email', sa.String(length=255), nullable=False), 
         sa.Column('timestamp', sa.DateTime(), server_default=sa.func.now(), nullable=False),
     )
     # Add topic column to questions table
@@ -34,6 +35,7 @@ def upgrade() -> None:
         sa.Column('id', sa.Integer(), primary_key=True),
         sa.Column('question_id', sa.Integer(), sa.ForeignKey('questions.id'), nullable=False, index=True),
         sa.Column('up', sa.Boolean(), nullable=False),
+        sa.Column('user_email', sa.String(length=255), nullable=False), 
         sa.Column('timestamp', sa.DateTime(), server_default=sa.func.now(), nullable=False),
     )
 

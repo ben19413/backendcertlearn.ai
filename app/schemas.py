@@ -42,10 +42,12 @@ class AnswerLog(BaseModel):
     id: Optional[int]
     question_id: int
     selected_answer: int
+    user_email: str
     timestamp: datetime
 
 class OpinionLog(BaseModel):
     id: Optional[int]
     question_id: int
     up: bool
+    user_email: str
     timestamp: datetime
