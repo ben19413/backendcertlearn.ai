@@ -1,6 +1,6 @@
 import asyncio
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Dict, Any
 import aiofiles
 from models import QuestionDB
 from schemas import QuestionRequest, QuestionResponse, ErrorResponse, ExamType, InProgressSetsResponse

@@ -53,4 +53,4 @@ class OpinionLog(BaseModel):
     timestamp: datetime
 
 class InProgressSetsResponse(BaseModel):
-    in_progress_sets: List[str]
+    in_progress_sets: list[str]
