@@ -27,7 +27,7 @@ class GeminiClient:
         exam_pdf_bytes: bytes
     ) -> QuestionResponse:
         """Generate questions asynchronously with structured output, passing PDF as input using types.Part.from_bytes."""
-        prompt = PromptTemplates.get_full_prompt(exam_type, num_questions,)
+        prompt = PromptTemplates.get_full_prompt(exam_type, num_questions)
         loop = asyncio.get_event_loop()
         def call_gemini():
             pdf_part = genai.types.Part.from_bytes(
@@ -36,7 +36,7 @@ class GeminiClient:
             )
             return self.client.models.generate_content(
                 model="gemini-2.5-flash",
-                contents=[pdf_part, prompt],
+                contents=[prompt, pdf_part],
                 config={
                     "response_schema": QuestionResponse,
                     "response_mime_type": "application/json",

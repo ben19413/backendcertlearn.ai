@@ -36,8 +36,7 @@ For SAT-style questions:
 
 {exam_specific}
 
-The exam content in in the attached pdf file.
+Generate exactly {num_questions} multiple-choice questions based only on the EXAM CONTENT above, but you may use the USER BACKGROUND INFORMATION to personalize or contextualize the questions if appropriate. Each question should be appropriate for the {exam_type.value.upper()} exam format. Return the questions as a list of objects with the fields: question, correct_answer, and choices (where choices is a list of objects with label and text).
 
-
-
-Generate exactly {num_questions} multiple-choice questions based only on the EXAM CONTENT above, but you may use the USER BACKGROUND INFORMATION to personalize or contextualize the questions if appropriate. Each question should be appropriate for the {exam_type.value.upper()} exam format. Return the questions as a list of objects with the fields: question, correct_answer, and choices (where choices is a list of objects with label and text)."""
+The exam content is in the attached pdf file.
+"""
