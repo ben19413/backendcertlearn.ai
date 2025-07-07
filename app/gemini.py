@@ -27,11 +27,10 @@ class GeminiClient:
         exam_pdf_bytes: bytes
     ) -> QuestionResponse:
         """Generate questions asynchronously with structured output, passing PDF as input using types.Part.from_bytes."""
-        from google import genai as google_genai
-        prompt = PromptTemplates.get_full_prompt(exam_type, topic, num_questions, None)
+        prompt = PromptTemplates.get_full_prompt(exam_type, num_questions,)
         loop = asyncio.get_event_loop()
         def call_gemini():
-            pdf_part = google_genai.types.Part.from_bytes(
+            pdf_part = genai.types.Part.from_bytes(
                 data=exam_pdf_bytes,
                 mime_type='application/pdf',
             )

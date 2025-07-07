@@ -21,7 +21,7 @@ class CFA1Topic(str, Enum):
     alternative_investments = "alternative_investments"
     portfolio_management = "portfolio_management"
     ethical_and_professional_standards = "ethical_and_professional_standards"
-    # ... add more if needed
+    
 
 class QuestionRequest(BaseModel):
     """Request model for question generation."""
