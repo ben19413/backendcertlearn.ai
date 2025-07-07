@@ -20,28 +20,29 @@ class GeminiClient:
         self.client = genai.Client(api_key=self.api_key)
 
     async def generate_questions_async(
-        self, 
-        topic: str, 
-        num_questions: int, 
+        self,
+        topic: str,
+        num_questions: int,
         exam_type: ExamType,
-        exam_content: str
+        exam_pdf_bytes: bytes
     ) -> QuestionResponse:
-        """Generate questions asynchronously with structured output."""
-        # Compose the prompt using topic and exam_content
-        prompt = PromptTemplates.get_full_prompt(exam_type, topic, num_questions, exam_content)
-        #print(prompt)
+        """Generate questions asynchronously with structured output, passing PDF as input using types.Part.from_bytes."""
+        prompt = PromptTemplates.get_full_prompt(exam_type, num_questions)
         loop = asyncio.get_event_loop()
-        response = await loop.run_in_executor(
-            None,
-            lambda: self.client.models.generate_content(
-                model="gemini-2.0-flash",
-                contents=prompt,
+        def call_gemini():
+            pdf_part = genai.types.Part.from_bytes(
+                data=exam_pdf_bytes,
+                mime_type='application/pdf',
+            )
+            return self.client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=[prompt, pdf_part],
                 config={
-                    "response_mime_type": "application/json",
                     "response_schema": QuestionResponse,
+                    "response_mime_type": "application/json",
                 },
             )
-        )
+        response = await loop.run_in_executor(None, call_gemini)
         # Parse and validate response
         try:
             response_data = json.loads(response.text)

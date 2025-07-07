@@ -20,16 +20,16 @@ class QuestionGeneratorService:
         self.gemini_client = GeminiClient()
     
     async def generate_questions(self, request: QuestionRequest, test_id: str) -> QuestionResponse:
-        """Generate questions based on the request parameters."""
+        """Generate questions based on the request parameters, loading PDF and passing to Gemini."""
         try:
-            # Load exam content from a .txt file
-            exam_content = await self._load_exam_content(request.exam_type)
-            # Generate questions using Gemini, passing topic and exam_content
+            # Load PDF content as bytes (use .value for enum)
+            pdf_bytes = await self._load_exam_pdf(request.exam_type, request.topic.value)
+            # Generate questions using Gemini, passing topic and PDF bytes
             response = await self.gemini_client.generate_questions_async(
-                topic=request.topic,
+                topic=request.topic.value,
                 num_questions=request.num_questions,
                 exam_type=request.exam_type,
-                exam_content=exam_content
+                exam_pdf_bytes=pdf_bytes
             )
             # Save each question to the DB
             db = SessionLocal()
@@ -40,7 +40,7 @@ class QuestionGeneratorService:
                     user_email=request.user_email,
                     exam_type=request.exam_type.value,
                     question_set_id=request.question_set_id,
-                    topic=request.topic,  # <-- Add this line
+                    topic=request.topic.value,
                     question=q.question,
                     answer_1=q.answer_1,
                     answer_2=q.answer_2,
@@ -53,16 +53,16 @@ class QuestionGeneratorService:
         except Exception as e:
             raise RuntimeError(f"Failed to generate questions: {e}")
 
-    async def _load_exam_content(self, exam_type: ExamType) -> str:
-        """Load exam content from a .txt file."""
-        file_path = self.data_dir / f"{exam_type.value}.txt"
+    async def _load_exam_pdf(self, exam_type: ExamType, topic: str) -> bytes:
+        """Load exam PDF file as bytes from /data/{exam_name}/{topic}.pdf."""
+        file_path = self.data_dir / exam_type.value / f"{topic}.pdf"
         try:
-            async with aiofiles.open(file_path, 'r', encoding='utf-8') as file:
+            async with aiofiles.open(file_path, 'rb') as file:
                 return await file.read()
         except FileNotFoundError:
-            return ""
+            raise RuntimeError(f"PDF file not found: {file_path}")
         except Exception as e:
-            raise RuntimeError(f"Error loading content for {exam_type.value}: {e}")
+            raise RuntimeError(f"Error loading PDF for {exam_type.value}/{topic}: {e}")
 
     def list_questions_for_user(self, user_email: str):
         db = SessionLocal()

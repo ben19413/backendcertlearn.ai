@@ -3,16 +3,31 @@ from typing import List, Optional
 from pydantic import BaseModel, Field
 from datetime import datetime
 
+
 class ExamType(str, Enum):
     """Supported exam types with their identifiers."""
-    CFA1= "CFA1"
+    CFA1 = "CFA1"
     CFA3topics = "CFA3topics"
+
+# Enum for CFA1 topics
+class CFA1Topic(str, Enum):
+    quantitative_methods = "quantitative_methods"
+    economics = "economics"
+    corporate_issuers = "corporate_issuers"
+    financial_statement_analysis = "financial_statement_analysis"
+    equity_investments = "equity_investments"
+    fixed_income = "fixed_income"
+    derivatives = "derivatives"
+    alternative_investments = "alternative_investments"
+    portfolio_management = "portfolio_management"
+    ethical_and_professional_standards = "ethical_and_professional_standards"
+    
 
 class QuestionRequest(BaseModel):
     """Request model for question generation."""
     user_email: str = Field(..., description="User's email address")
     exam_type: ExamType = Field(default=ExamType.CFA3topics, description="Type of exam for question formatting")
-    topic: str = Field(..., min_length=1, max_length=200, description="Topic to generate questions about")
+    topic: CFA1Topic = Field(..., description="Topic to generate questions about (also used as the PDF filename, e.g. /data/CFA1/{topic}.pdf)")
     num_questions: int = Field(..., ge=1, le=20, description="Number of questions to generate")
     question_set_id: str = Field(..., description="Unique identifier for the question set")
 

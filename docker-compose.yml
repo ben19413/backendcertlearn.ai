@@ -10,6 +10,8 @@ services:
       - ./data:/data
     depends_on:
       - mssql
+    networks:
+      - certlearn-net
   mssql:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: mssql
@@ -24,3 +26,9 @@ services:
       interval: 10s
       timeout: 10s
       retries: 5
+    networks:
+      - certlearn-net
+
+networks:
+  certlearn-net:
+    external: true

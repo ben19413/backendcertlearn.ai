@@ -29,16 +29,14 @@ For SAT-style questions:
     }
     
     @classmethod
-    def get_full_prompt(cls, exam_type: ExamType, topic: str, num_questions: int, exam_content: str) -> str:
+    def get_full_prompt(cls, exam_type: ExamType, num_questions: int) -> str:
         """Generate complete prompt for question generation."""
         exam_specific = cls.EXAM_SPECIFIC_PROMPTS.get(exam_type, "")
         return f"""{cls.BASE_SYSTEM_PROMPT}
 
 {exam_specific}
 
-This is the exam content to generate questions from, ONLY use this content for question generation:
-{exam_content}
+Generate exactly {num_questions} multiple-choice questions based only on the EXAM CONTENT above, but you may use the USER BACKGROUND INFORMATION to personalize or contextualize the questions if appropriate. Each question should be appropriate for the {exam_type.value.upper()} exam format. Return the questions as a list of objects with the fields: question, correct_answer, and choices (where choices is a list of objects with label and text).
 
-The content that should the questions should soley be focused on is {topic}
-
-Generate exactly {num_questions} multiple-choice questions based only on the EXAM CONTENT above, but you may use the USER BACKGROUND INFORMATION to personalize or contextualize the questions if appropriate. Each question should be appropriate for the {exam_type.value.upper()} exam format. Return the questions as a list of objects with the fields: question, correct_answer, and choices (where choices is a list of objects with label and text)."""
+The exam content is in the attached pdf file.
+"""
