@@ -19,37 +19,42 @@ class QuestionGeneratorService:
         self.data_dir = Path(data_dir)
         self.gemini_client = GeminiClient()
     
-    async def generate_questions(self, request: QuestionRequest, test_id: str) -> QuestionResponse:
-        """Generate questions based on the request parameters, loading PDF and passing to Gemini."""
+    async def generate_questions(self, request: QuestionRequest, test_id: str, question_set_id: str) -> QuestionResponse:
+        """Generate questions for each topic and store under the same question set id."""
         try:
-            # Load PDF content as bytes (use .value for enum)
-            pdf_bytes = await self._load_exam_pdf(request.exam_type, request.topic.value)
-            # Generate questions using Gemini, passing topic and PDF bytes
-            response = await self.gemini_client.generate_questions_async(
-                topic=request.topic.value,
-                num_questions=request.num_questions,
-                exam_type=request.exam_type,
-                exam_pdf_bytes=pdf_bytes
-            )
-            # Save each question to the DB
-            db = SessionLocal()
-            repo = QuestionRepository(db)
-            for q in response.questions:
-                repo.add_question(
-                    test_id=test_id,
-                    user_email=request.user_email,
-                    exam_type=request.exam_type.value,
-                    question_set_id=request.question_set_id,
-                    topic=request.topic.value,
-                    question=q.question,
-                    answer_1=q.answer_1,
-                    answer_2=q.answer_2,
-                    answer_3=q.answer_3,
-                    answer_4=q.answer_4,
-                    solution=q.solution
+            all_questions = []
+            exam_type = request.exam_type
+            for topic in request.topics:
+                pdf_bytes = await self._load_exam_pdf(exam_type, topic.value)
+                response = await self.gemini_client.generate_questions_async(
+                    topic=topic.value,
+                    num_questions=request.num_questions,
+                    exam_type=exam_type,
+                    exam_pdf_bytes=pdf_bytes
                 )
-            db.close()
-            return response
+                db = SessionLocal()
+                repo = QuestionRepository(db)
+                for q in response.questions:
+                    repo.add_question(
+                        test_id=test_id,
+                        exam_type=exam_type.value,
+                        question_set_id=question_set_id,
+                        topic=topic.value,
+                        question=q.question,
+                        answer_1=q.answer_1,
+                        answer_2=q.answer_2,
+                        answer_3=q.answer_3,
+                        answer_4=q.answer_4,
+                        solution=q.solution
+                    )
+                db.close()
+                all_questions.extend(response.questions)
+            return QuestionResponse(
+                test_id=test_id,
+                questions=all_questions,
+                exam_type=exam_type,
+                total_questions=len(all_questions)
+            )
         except Exception as e:
             raise RuntimeError(f"Failed to generate questions: {e}")
 

@@ -7,7 +7,6 @@ class QuestionDB(Base):
     __tablename__ = "questions"
     id = Column(Integer, primary_key=True, index=True)
     test_id = Column(Integer, nullable=False, index=True) 
-    user_email = Column(String(255), nullable=False, index=True)
     exam_type = Column(String(50), nullable=False)
     question_set_id = Column(String(255), nullable=False, index=True)  
     topic = Column(String(255), nullable=False)  
