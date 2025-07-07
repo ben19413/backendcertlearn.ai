@@ -43,10 +43,11 @@ class AnswerLogRepository:
     def __init__(self, db_session: Session):
         self.db = db_session
 
-    def add_log(self, question_id: int, selected_answer: int):
+    def add_log(self, question_id: int, selected_answer: int, user_email: str):
         log = AnswerLogDB(
             question_id=question_id,
-            selected_answer=selected_answer
+            selected_answer=selected_answer,
+            user_email=user_email
         )
         self.db.add(log)
         self.db.commit()
@@ -59,16 +60,17 @@ class AnswerLogRepository:
         return self.db.query(QuestionLogDB).filter(QuestionLogDB.question_id == question_id).all()
 
     def get_logs_for_user(self, user_email: str):
-        return self.db.query(QuestionLogDB).filter(QuestionLogDB.user_email == user_email).all()
+        return self.db.query(AnswerLogDB).filter(AnswerLogDB.user_email == user_email).all()
 
 class OpinionLogRepository:
     def __init__(self, db_session: Session):
         self.db = db_session
 
-    def add_opinion(self, question_id: int, up: bool):
+    def add_opinion(self, question_id: int, up: bool, user_email: str):  # <-- Add user_email param
         log = OpinionLogDB(
             question_id=question_id,
-            up=up
+            up=up,
+            user_email=user_email  # <-- Store user_email
         )
         self.db.add(log)
         self.db.commit()

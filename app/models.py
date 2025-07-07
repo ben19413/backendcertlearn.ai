@@ -23,12 +23,14 @@ class AnswerLogDB(Base):
     id = Column(Integer, primary_key=True)
     question_id = Column(Integer, ForeignKey("questions.id"), nullable=False, index=True)
     selected_answer = Column(Integer, nullable=False)
+    user_email = Column(String(255), nullable=False)
     timestamp = Column(DateTime, server_default=func.now(), nullable=False)
 
 class OpinionLogDB(Base):
     __tablename__ = "opinion_logs"
     id = Column(Integer, primary_key=True)
     question_id = Column(Integer, ForeignKey("questions.id"), nullable=False, index=True)
-    up = Column(Boolean, nullable=False) 
+    up = Column(Boolean, nullable=False)
+    user_email = Column(String(255), nullable=False)
     timestamp = Column(DateTime, server_default=func.now(), nullable=False)
 

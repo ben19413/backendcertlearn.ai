@@ -7,6 +7,8 @@ import uuid
 from sqlalchemy.orm import Session
 from models import QuestionDB
 import sqlalchemy as sa
+from sqlalchemy import select
+from models import AnswerLogDB
 
 logger = logging.getLogger(__name__)
 
@@ -118,3 +120,18 @@ def get_logs_for_user(user_email: str):
 def log_opinion(log: OpinionLog):
     """Log an up/down opinion for a question."""
     return opinion_service.add_opinion(log)
+
+
+@router.get(
+    "/unseen",
+    response_model=QuestionResponse,
+    summary="List unseen questions for a user in a question set",
+    description="Return all questions in a question set that the user has not answered yet"
+)
+def list_unseen_questions(
+    user_email: str = Query(..., description="User's email address"),
+    question_set_id: str = Query(..., description="Question set identifier"),
+    service: QuestionGeneratorService = Depends(get_question_service)
+):
+    """List all unseen questions for a user in a question set."""
+    return service.get_unseen_questions_for_user_and_set(user_email, question_set_id)
