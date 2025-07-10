@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Dict, Any
 import aiofiles
 from models import QuestionDB
-from schemas import QuestionRequest, QuestionResponse, ErrorResponse, ExamType, InProgressSetsResponse
+from schemas import QuestionRequest, QuestionResponse, ErrorResponse, ExamType, InProgressSetsResponse, Question
 from gemini import GeminiClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -19,12 +19,16 @@ class QuestionGeneratorService:
         self.data_dir = Path(data_dir)
         self.gemini_client = GeminiClient()
     
-    async def generate_questions(self, request: QuestionRequest, test_id: str, question_set_id: str) -> QuestionResponse:
-        """Generate questions for each topic and store under the same question set id."""
+    async def generate_questions(self, request: QuestionRequest, test_id: int, batch_number: int) -> QuestionResponse:
+        """
+        Generate a batch of questions: N questions for each topic.
+        Each question will be tagged with its topic, topic_number (1..N), and batch_number (index of topic in topics list, starting from 1).
+        All questions are stored under the same batch_number.
+        """
         try:
             all_questions = []
             exam_type = request.exam_type
-            for topic in request.topics:
+            for topic_batch_number, topic in enumerate(request.topics, start=1):
                 pdf_bytes = await self._load_exam_pdf(exam_type, topic.value)
                 response = await self.gemini_client.generate_questions_async(
                     topic=topic.value,
@@ -34,12 +38,13 @@ class QuestionGeneratorService:
                 )
                 db = SessionLocal()
                 repo = QuestionRepository(db)
-                for q in response.questions:
+                for topic_number, q in enumerate(response.questions, start=1):
                     repo.add_question(
                         test_id=test_id,
                         exam_type=exam_type.value,
-                        question_set_id=question_set_id,
                         topic=topic.value,
+                        topic_number=topic_number,
+                        batch_number=batch_number,
                         question=q.question,
                         answer_1=q.answer_1,
                         answer_2=q.answer_2,
@@ -47,11 +52,15 @@ class QuestionGeneratorService:
                         answer_4=q.answer_4,
                         solution=q.solution
                     )
+                    q_dict = q.dict()
+                    q_dict["topic"] = topic.value
+                    q_dict["topic_number"] = topic_number
+                    q_dict["batch_number"] = batch_number
+                    all_questions.append(q_dict)
                 db.close()
-                all_questions.extend(response.questions)
             return QuestionResponse(
                 test_id=test_id,
-                questions=all_questions,
+                questions=[Question(**q) for q in all_questions],
                 exam_type=exam_type,
                 total_questions=len(all_questions)
             )
@@ -207,4 +216,5 @@ class OpinionLogService:
 DATABASE_URL = os.getenv("DATABASE_URL", "mssql+pyodbc://sa:YourStrong!Passw0rd@mssql:1433/master?driver=ODBC+Driver+17+for+SQL+Server")
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
 

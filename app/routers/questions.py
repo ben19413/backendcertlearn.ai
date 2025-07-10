@@ -38,18 +38,18 @@ async def generate_questions(
     request: QuestionRequest,
     service: QuestionGeneratorService = Depends(get_question_service)
 ) -> QuestionResponse:
-    """Generate multiple choice questions for each topic and store under the same question set id."""
+    """Generate multiple choice questions for each topic and store under the same batch (batch_number)."""
     try:
         db = SessionLocal()
         # Generate a new integer test_id (one greater than the current max)
         max_test_id = db.query(sa.func.max(sa.cast(QuestionDB.test_id, sa.Integer))).scalar() or 0
         test_id = max_test_id + 1
-        # Generate a new integer question_set_id (one greater than the current max)
-        max_qsid = db.query(sa.func.max(sa.cast(QuestionDB.question_set_id, sa.Integer))).scalar() or 0
-        question_set_id = str(max_qsid + 1)
+        # Generate a new integer batch_number (one greater than the current max)
+        max_batch = db.query(sa.func.max(sa.cast(QuestionDB.batch_number, sa.Integer))).scalar() or 0
+        batch_number = max_batch + 1
         db.close()
-        logger.info(f"Generating {request.num_questions} questions for each topic in {request.topics} for {request.exam_type.value} with test_id {test_id} and question_set_id {question_set_id}")
-        response = await service.generate_questions(request, test_id=test_id, question_set_id=question_set_id)
+        logger.info(f"Generating {request.num_questions} questions for each topic in {request.topics} for {request.exam_type.value} with test_id {test_id} and batch_number {batch_number}")
+        response = await service.generate_questions(request, test_id=test_id, batch_number=batch_number)
         logger.info(f"Successfully generated {response.total_questions} questions")
         response.test_id = test_id
         return response
