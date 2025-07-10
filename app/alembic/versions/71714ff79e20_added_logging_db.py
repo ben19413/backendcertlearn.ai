@@ -27,8 +27,7 @@ def upgrade() -> None:
         sa.Column('user_email', sa.String(length=255), nullable=False), 
         sa.Column('timestamp', sa.DateTime(), server_default=sa.func.now(), nullable=False),
     )
-    # Add topic column to questions table
-    op.add_column('questions', sa.Column('topic', sa.String(length=255), nullable=True))
+
     # Add opinion_logs table
     op.create_table(
         'opinion_logs',
@@ -42,5 +41,5 @@ def upgrade() -> None:
 def downgrade():
     op.drop_table('opinion_logs')
     op.drop_table('answer_logs')
-    op.drop_column('questions', 'topic')
+
 

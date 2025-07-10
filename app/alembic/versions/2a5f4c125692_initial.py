@@ -23,7 +23,9 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), nullable=False, primary_key=True),
     sa.Column('test_id', sa.Integer(), nullable=False),
     sa.Column('exam_type', sa.String(length=50), nullable=False),
-    sa.Column('question_set_id', sa.String(length=255), nullable=False),
+    sa.Column('topic', sa.String(length=255), nullable=False),
+    sa.Column('topic_number', sa.Integer(), nullable=False, server_default="1"),
+    sa.Column('batch_number', sa.Integer(), nullable=False, server_default="1"),
     sa.Column('question', sa.String(), nullable=False),
     sa.Column('answer_1', sa.String(), nullable=False),
     sa.Column('answer_2', sa.String(), nullable=False),
@@ -37,5 +39,6 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     """Downgrade schema."""
+    op.drop_index(op.f('ix_questions_test_id'), table_name='questions')
     op.drop_table('questions')
 

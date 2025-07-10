@@ -41,6 +41,9 @@ class Question(BaseModel):
     answer_3: str
     answer_4: str
     solution: int = Field(..., ge=1, le=4, description="Indicates which answer (1-4) is correct")
+    topic: str
+    topic_number: int
+    batch_number: int
 
 class QuestionResponse(BaseModel):
     test_id: int = Field(..., description="Unique integer identifier for the test session")
