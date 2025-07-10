@@ -2,10 +2,11 @@ import asyncio
 from pathlib import Path
 from typing import Dict, Any
 import aiofiles
-from models import QuestionDB
-from schemas import QuestionRequest, QuestionResponse, ErrorResponse, ExamType, InProgressSetsResponse, Question
+from models import QuestionDB, QuestionSetDB
+from schemas import QuestionRequest, QuestionResponse, ErrorResponse, ExamType, InProgressSetsResponse, Question, CreateQuestionSetRequest, QuestionSetResponse
 from gemini import GeminiClient
 from sqlalchemy import create_engine
+import sqlalchemy as sa
 from sqlalchemy.orm import sessionmaker
 from question_repository import QuestionRepository, AnswerLogRepository, OpinionLogRepository
 import os
@@ -165,6 +166,45 @@ class QuestionGeneratorService:
                 if answered_count > 0 and answered_count < total_questions:
                     in_progress_sets.append(question_set_id)
             return InProgressSetsResponse(in_progress_sets=in_progress_sets)
+        finally:
+            db.close()
+
+    def create_question_set_for_user(self, request: CreateQuestionSetRequest) -> QuestionSetResponse:
+        db = SessionLocal()
+        try:
+            repo = QuestionRepository(db)
+            # Generate a new question_set_id
+            max_qsid = db.query(sa.func.max(sa.cast(QuestionSetDB.question_set_id, sa.Integer))).scalar() or 0
+            question_set_id = max_qsid + 1
+            # Get next questions for each topic
+            next_questions = repo.get_next_questions_for_topics(
+                user_email=request.user_email,
+                topics=request.topics,
+                num_questions_per_topic=request.num_questions_per_topic
+            )
+            # Add entries to question_sets table
+            for q in next_questions:
+                repo.add_question_set_entry(
+                    question_set_id=question_set_id,
+                    question_id=q.id,
+                    user_email=request.user_email
+                )
+            # Prepare response
+            questions = [Question(
+                question=q.question,
+                answer_1=q.answer_1,
+                answer_2=q.answer_2,
+                answer_3=q.answer_3,
+                answer_4=q.answer_4,
+                solution=q.solution,
+                topic=q.topic,
+                topic_number=q.topic_number,
+                batch_number=q.batch_number
+            ) for q in next_questions]
+            return QuestionSetResponse(
+                question_set_id=question_set_id,
+                questions=questions
+            )
         finally:
             db.close()
 

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends, Query
 from fastapi.responses import JSONResponse
-from schemas import QuestionRequest, QuestionResponse, ErrorResponse, Question, ExamType, AnswerLog, OpinionLog
+from schemas import QuestionRequest, QuestionResponse, ErrorResponse, Question, ExamType, AnswerLog, OpinionLog, CreateQuestionSetRequest, QuestionSetResponse
 from services import QuestionGeneratorService, SessionLocal, QuestionLogService, OpinionLogService, InProgressSetsResponse
 import logging
 import uuid
@@ -153,3 +153,17 @@ def list_in_progress_question_sets(
     Returns a list of question_set_id values that are in progress.
     """
     return service.get_in_progress_question_sets_for_user(user_email)
+
+
+@router.post(
+    "/create_question_set",
+    response_model=QuestionSetResponse,
+    summary="Create a question set for a user from specified topics",
+    description="Assigns next N questions from each topic to a user and returns the question set"
+)
+def create_question_set(
+    request: CreateQuestionSetRequest,
+    service: QuestionGeneratorService = Depends(get_question_service)
+):
+    """Create a question set for a user from specified topics."""
+    return service.create_question_set_for_user(request)
