@@ -5,7 +5,7 @@ class QuestionRepository:
     def __init__(self, db_session: Session):
         self.db = db_session
 
-    def add_question(self, test_id: str, exam_type: str, topic: str, topic_number: int, batch_number: int, question: str, answer_1: str, answer_2: str, answer_3: str, answer_4: str, solution: int):
+    def add_question(self, test_id: int, exam_type: str, topic: str, topic_number: int, batch_number: int, question: str, answer_1: str, answer_2: str, answer_3: str, answer_4: str, solution: int):
         db_question = QuestionDB(
             test_id=test_id,
             exam_type=exam_type,
