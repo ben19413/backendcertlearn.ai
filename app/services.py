@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Dict, Any
 import aiofiles
 from models import QuestionDB
-from schemas import QuestionRequest, QuestionResponse, ErrorResponse, ExamType, InProgressSetsResponse
+from schemas import QuestionRequest, QuestionResponse, ErrorResponse, ExamType, InProgressSetsResponse, Question
 from gemini import GeminiClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -58,7 +58,6 @@ class QuestionGeneratorService:
                     q_dict["batch_number"] = batch_number
                     all_questions.append(q_dict)
                 db.close()
-            from schemas import Question
             return QuestionResponse(
                 test_id=test_id,
                 questions=[Question(**q) for q in all_questions],
