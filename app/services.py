@@ -19,7 +19,7 @@ class QuestionGeneratorService:
         self.data_dir = Path(data_dir)
         self.gemini_client = GeminiClient()
     
-    async def generate_questions(self, request: QuestionRequest, test_id: str, batch_number: int) -> QuestionResponse:
+    async def generate_questions(self, request: QuestionRequest, test_id: int, batch_number: int) -> QuestionResponse:
         """
         Generate a batch of questions: N questions for each topic.
         Each question will be tagged with its topic, topic_number (1..N), and batch_number (index of topic in topics list, starting from 1).
