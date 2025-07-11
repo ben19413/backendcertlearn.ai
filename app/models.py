@@ -35,7 +35,7 @@ class OpinionLogDB(Base):
     timestamp = Column(DateTime, server_default=func.now(), nullable=False)
 
 class QuestionSetDB(Base):
-    __tablename__ = "question_sets"
+    __tablename__ = "question_set_lookup_table"
     id = Column(Integer, primary_key=True, index=True)
     question_set_id = Column(Integer, nullable=False, index=True)
     question_id = Column(Integer, ForeignKey("questions.id"), nullable=False, index=True)

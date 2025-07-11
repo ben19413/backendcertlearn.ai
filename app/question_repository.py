@@ -100,9 +100,6 @@ class AnswerLogRepository:
 
     def get_logs_for_question(self, question_id: int):
         return self.db.query(AnswerLogDB).filter(AnswerLogDB.question_id == question_id).all()
-    def get_logs_for_question(self, question_id: int):
-        return self.db.query(QuestionLogDB).filter(QuestionLogDB.question_id == question_id).all()
-
     def get_logs_for_user(self, user_email: str):
         return self.db.query(AnswerLogDB).filter(AnswerLogDB.user_email == user_email).all()
 
