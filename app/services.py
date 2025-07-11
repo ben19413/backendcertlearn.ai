@@ -2,7 +2,7 @@ import asyncio
 from pathlib import Path
 from typing import Dict, Any
 import aiofiles
-from models import QuestionDB, QuestionSetDB
+from models import QuestionDB, QuestionSetDB, AnswerLogDB
 from schemas import QuestionRequest, QuestionResponse, ErrorResponse, ExamType, InProgressSetsResponse, Question, CreateQuestionSetRequest, QuestionSetResponse
 from gemini import GeminiClient
 from sqlalchemy import create_engine
@@ -110,20 +110,39 @@ class QuestionGeneratorService:
     def get_unseen_questions_for_user_and_set(self, user_email: str, question_set_id: str):
         db = SessionLocal()
         try:
-            questions = db.query(QuestionDB).filter(QuestionDB.question_set_id == question_set_id).all()
-            question_ids = [q.id for q in questions]
-            from models import AnswerLogDB
-            seen_logs = db.query(AnswerLogDB.question_id).filter(
+            # Get all question_ids in this question set for this user
+            question_set_entries = db.query(QuestionSetDB).filter(
+                QuestionSetDB.question_set_id == question_set_id,
+                QuestionSetDB.user_email == user_email
+            ).all()
+            
+            if not question_set_entries:
+                # No questions in this set for this user
+                return QuestionResponse(
+                    test_id=0,
+                    questions=[],
+                    exam_type=ExamType.CFA3topics,
+                    total_questions=0
+                )
+            
+            question_ids = [entry.question_id for entry in question_set_entries]
+            
+            # Get all questions in the set
+            questions = db.query(QuestionDB).filter(QuestionDB.id.in_(question_ids)).all()
+            
+            # Find which questions the user has already answered
+            answered_question_ids = db.query(AnswerLogDB.question_id).filter(
                 AnswerLogDB.user_email == user_email,
                 AnswerLogDB.question_id.in_(question_ids)
             ).distinct().all()
-            seen_ids = {row[0] for row in seen_logs}
-            unseen_questions = [q for q in questions if q.id not in seen_ids]
-            if questions:
-                exam_type = questions[0].exam_type
-            else:
-                exam_type = None
-            from schemas import Question, ExamType, QuestionResponse
+            answered_ids = {row[0] for row in answered_question_ids}
+            
+            # Filter to get only unseen questions
+            unseen_questions = [q for q in questions if q.id not in answered_ids]
+            
+            # Get exam_type from the first question if available
+            exam_type = questions[0].exam_type if questions else None
+            
             pydantic_questions = [
                 Question(
                     question=q.question,
@@ -131,23 +150,25 @@ class QuestionGeneratorService:
                     answer_2=q.answer_2,
                     answer_3=q.answer_3,
                     answer_4=q.answer_4,
-                    solution=q.solution
+                    solution=q.solution,
+                    topic=q.topic,
+                    topic_number=q.topic_number,
+                    batch_number=q.batch_number
                 ) for q in unseen_questions
             ]
-            response = QuestionResponse(
+            
+            return QuestionResponse(
                 test_id=0,
                 questions=pydantic_questions,
                 exam_type=ExamType(exam_type) if exam_type else ExamType.CFA3topics,
                 total_questions=len(pydantic_questions)
             )
-            return response
         finally:
             db.close()
 
     def get_in_progress_question_sets_for_user(self, user_email: str) -> InProgressSetsResponse:
         db = SessionLocal()
         try:
-            from models import AnswerLogDB
             set_ids = db.query(QuestionDB.question_set_id).distinct().all()
             set_ids = [row[0] for row in set_ids]
             in_progress_sets = []
@@ -256,5 +277,4 @@ class OpinionLogService:
 DATABASE_URL = os.getenv("DATABASE_URL", "mssql+pyodbc://sa:YourStrong!Passw0rd@mssql:1433/master?driver=ODBC+Driver+17+for+SQL+Server")
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
 
