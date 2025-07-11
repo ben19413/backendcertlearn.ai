@@ -37,7 +37,7 @@ class OpinionLogDB(Base):
 class QuestionSetDB(Base):
     __tablename__ = "question_sets"
     id = Column(Integer, primary_key=True, index=True)
-    question_set_id = Column(Integer, nullable=False, index=True)
-    question_id = Column(Integer, ForeignKey("questions.id"), nullable=False, index=True)
-    user_email = Column(String(255), nullable=False, index=True)
+    question_set_id = Column(Integer, nullable=False)
+    question_id = Column(Integer, ForeignKey("questions.id"), nullable=False)
+    user_email = Column(String(255), nullable=False)
 

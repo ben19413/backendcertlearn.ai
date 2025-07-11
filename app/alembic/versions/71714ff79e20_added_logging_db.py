@@ -41,9 +41,9 @@ def upgrade() -> None:
     op.create_table(
         'question_sets',
         sa.Column('id', sa.Integer(), primary_key=True),
-        sa.Column('question_set_id', sa.Integer(), nullable=False, index=True),
-        sa.Column('question_id', sa.Integer(), sa.ForeignKey('questions.id'), nullable=False, index=True),
-        sa.Column('user_email', sa.String(length=255), nullable=False, index=True),
+        sa.Column('question_set_id', sa.Integer(), nullable=False),
+        sa.Column('question_id', sa.Integer(), sa.ForeignKey('questions.id'), nullable=False),
+        sa.Column('user_email', sa.String(length=255), nullable=False),
     )
 
 def downgrade():

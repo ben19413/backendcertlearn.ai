@@ -45,7 +45,7 @@ class QuestionRepository:
         return entry
 
     def get_question_set_questions(self, question_set_id: int, user_email: str):
-        from models import QuestionDB
+        
         entries = self.db.query(QuestionSetDB).filter(
             QuestionSetDB.question_set_id == question_set_id,
             QuestionSetDB.user_email == user_email
@@ -54,7 +54,6 @@ class QuestionRepository:
         return self.db.query(QuestionDB).filter(QuestionDB.id.in_(question_ids)).all()
 
     def get_next_questions_for_topics(self, user_email: str, topics: list[str], num_questions_per_topic: int):
-        from models import QuestionDB, QuestionSetDB
         next_questions = []
         for topic in topics:
             # Find the largest (batch_number, topic_number) already assigned for this user/topic
