@@ -131,7 +131,7 @@ def log_opinion(log: OpinionLog):
 )
 def list_unseen_questions(
     user_email: str = Query(..., description="User's email address"),
-    question_set_id: str = Query(..., description="Question set identifier"),
+    question_set_id: int = Query(..., description="Question set identifier"),
     service: QuestionGeneratorService = Depends(get_question_service)
 ):
     """List all unseen questions for a user in a question set."""
