@@ -71,3 +71,17 @@ class OpinionLog(BaseModel):
 
 class InProgressSetsResponse(BaseModel):
     in_progress_sets: list[str]
+
+class QuestionSetEntry(BaseModel):
+    question_set_id: int
+    question_id: int
+    user_email: str
+
+class CreateQuestionSetRequest(BaseModel):
+    user_email: str
+    topics: list[str]
+    num_questions_per_topic: int
+
+class QuestionSetResponse(BaseModel):
+    question_set_id: int
+    questions: list[Question]

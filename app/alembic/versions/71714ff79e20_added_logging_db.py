@@ -38,7 +38,16 @@ def upgrade() -> None:
         sa.Column('timestamp', sa.DateTime(), server_default=sa.func.now(), nullable=False),
     )
 
+    op.create_table(
+        'question_set_lookup_table',
+        sa.Column('id', sa.Integer(), primary_key=True),
+        sa.Column('question_set_id', sa.Integer(), nullable=False),
+        sa.Column('question_id', sa.Integer(), sa.ForeignKey('questions.id'), nullable=False),
+        sa.Column('user_email', sa.String(length=255), nullable=False),
+    )
+
 def downgrade():
+    op.drop_table('question_set_lookup_table')
     op.drop_table('opinion_logs')
     op.drop_table('answer_logs')
 
