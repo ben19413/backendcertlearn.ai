@@ -82,23 +82,6 @@ async def health_check():
     """Health check endpoint for the questions service."""
     return {"status": "healthy", "service": "questions"}
 
-
-@router.get("/list", response_model=list[Question])
-def list_questions(test_id: str = Query(...), service: QuestionGeneratorService = Depends(get_question_service)):
-    """List all questions for a specific test_id."""
-    questions = service.list_questions_for_test(test_id)
-    return questions
-
-
-@router.get("/get", response_model=Question)
-def get_question(test_id: str = Query(...), question_id: int = Query(...), service: QuestionGeneratorService = Depends(get_question_service)):
-    """Get a specific question by test_id and id."""
-    question = service.get_question_for_test(test_id, question_id)
-    if not question:
-        raise HTTPException(status_code=404, detail="Question not found")
-    return question
-
-
 @router.post("/log", response_model=AnswerLog)
 def log_question_answer(log: AnswerLog):
     """Log a student's answer for a question."""
@@ -107,15 +90,6 @@ def log_question_answer(log: AnswerLog):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-@router.get("/logs/question/{question_id}", response_model=list[AnswerLog])
-def get_logs_for_question(question_id: int):
-    """Get all logs for a specific question."""
-    return log_service.get_logs_for_question(question_id)
-
-@router.get("/logs/user/{user_email}", response_model=list[AnswerLog])
-def get_logs_for_user(user_email: str):
-    """Get all logs for a specific user."""
-    return log_service.get_logs_for_user(user_email)
 
 @router.post("/opinion", response_model=OpinionLog)
 def log_opinion(log: OpinionLog):
@@ -131,7 +105,7 @@ def log_opinion(log: OpinionLog):
 )
 def list_unseen_questions(
     user_email: str = Query(..., description="User's email address"),
-    question_set_id: str = Query(..., description="Question set identifier"),
+    question_set_id: int = Query(..., description="Question set identifier"),
     service: QuestionGeneratorService = Depends(get_question_service)
 ):
     """List all unseen questions for a user in a question set."""
