@@ -121,7 +121,7 @@ class QuestionGeneratorService:
                 return QuestionResponse(
                     test_id=0,
                     questions=[],
-                    exam_type=ExamType.CFA3topics,
+                    exam_type=ExamType.CFA1,
                     total_questions=0
                 )
             
