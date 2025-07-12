@@ -107,7 +107,7 @@ class QuestionGeneratorService:
         db.close()
         return question
 
-    def get_unseen_questions_for_user_and_set(self, user_email: str, question_set_id: str):
+    def get_unseen_questions_for_user_and_set(self, user_email: str, question_set_id: int):
         db = SessionLocal()
         try:
             # Get all question_ids in this question set for this user
@@ -169,23 +169,35 @@ class QuestionGeneratorService:
     def get_in_progress_question_sets_for_user(self, user_email: str) -> InProgressSetsResponse:
         db = SessionLocal()
         try:
-            set_ids = db.query(QuestionDB.question_set_id).distinct().all()
+            # Get all unique question_set_ids for this user from the question_set_lookup_table
+            set_ids = db.query(QuestionSetDB.question_set_id).filter(
+                QuestionSetDB.user_email == user_email
+            ).distinct().all()
             set_ids = [row[0] for row in set_ids]
+            
             in_progress_sets = []
             for question_set_id in set_ids:
-                questions = db.query(QuestionDB).filter(QuestionDB.question_set_id == question_set_id).all()
-                question_ids = [q.id for q in questions]
+                # Get all question_ids in this question set for this user
+                question_set_entries = db.query(QuestionSetDB.question_id).filter(
+                    QuestionSetDB.question_set_id == question_set_id,
+                    QuestionSetDB.user_email == user_email
+                ).all()
+                question_ids = [row[0] for row in question_set_entries]
                 total_questions = len(question_ids)
+                
                 if total_questions == 0:
                     continue
+                
                 # Count how many of these questions have been answered by the user
-                answered_count = db.query(AnswerLogDB).filter(
+                answered_count = db.query(AnswerLogDB.question_id).filter(
                     AnswerLogDB.user_email == user_email,
                     AnswerLogDB.question_id.in_(question_ids)
-                ).distinct(AnswerLogDB.question_id).count()
+                ).distinct().count()
+                
                 # Only in progress if at least one answered and not all answered
                 if answered_count > 0 and answered_count < total_questions:
-                    in_progress_sets.append(question_set_id)
+                    in_progress_sets.append(str(question_set_id))
+                    
             return InProgressSetsResponse(in_progress_sets=in_progress_sets)
         finally:
             db.close()

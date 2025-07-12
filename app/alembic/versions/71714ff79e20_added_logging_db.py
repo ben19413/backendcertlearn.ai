@@ -39,7 +39,7 @@ def upgrade() -> None:
     )
 
     op.create_table(
-        'question_sets',
+        'question_set_lookup_table',
         sa.Column('id', sa.Integer(), primary_key=True),
         sa.Column('question_set_id', sa.Integer(), nullable=False, index=True),
         sa.Column('question_id', sa.Integer(), sa.ForeignKey('questions.id'), nullable=False, index=True),
@@ -47,7 +47,7 @@ def upgrade() -> None:
     )
 
 def downgrade():
-    op.drop_table('question_sets')
+    op.drop_table('question_set_lookup_table')
     op.drop_table('opinion_logs')
     op.drop_table('answer_logs')
 
