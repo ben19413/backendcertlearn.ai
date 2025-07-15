@@ -60,3 +60,28 @@ class GeminiClient:
             raise ValueError(f"Invalid JSON response from Gemini: {e}")
         except Exception as e:
             raise RuntimeError(f"Error generating questions: {e}")
+
+    async def generate_learning_material_async(
+        self,
+        exam_pdf_bytes: bytes
+    ) -> str:
+        """Generate learning materials asynchronously from PDF content."""
+        prompt = PromptTemplates.LEARNING_MATERIAL_PROMPT
+        loop = asyncio.get_event_loop()
+        
+        def call_gemini():
+            pdf_part = genai.types.Part.from_bytes(
+                data=exam_pdf_bytes,
+                mime_type='application/pdf',
+            )
+            return self.client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=[prompt, pdf_part],
+            )
+        
+        response = await loop.run_in_executor(None, call_gemini)
+        
+        if not response.text:
+            raise RuntimeError("Empty response from Gemini API")
+        
+        return response.text.strip()
