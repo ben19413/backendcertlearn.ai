@@ -16,6 +16,23 @@ Your task is to generate educational assessment questions based on the specified
 
 """
 
+    LEARNING_MATERIAL_PROMPT = """You are an expert educational content creator specializing in exam preparation materials.
+
+Your task is to create comprehensive learning materials that will help students prepare for exam questions on this topic. The learning materials should:
+
+1. Provide clear explanations of key concepts
+2. Include relevant formulas, definitions, and principles
+3. Explain important relationships between concepts
+4. Highlight common misconceptions and how to avoid them
+5. Include practical examples and applications
+6. Be organized in a logical, easy-to-follow structure
+7. Focus on the most important and testable content
+
+The content should be thorough enough to prepare students for multiple-choice questions but concise enough to be digestible. Write in a clear, educational tone that is appropriate for exam candidates.
+
+Generate comprehensive learning materials based on the content in the attached PDF file. Return the content as plain text that students can read to prepare for questions on this topic.
+"""
+
     EXAM_SPECIFIC_PROMPTS: Dict[ExamType, str] = {
         ExamType.CFA1: """
 For SAT-style questions:

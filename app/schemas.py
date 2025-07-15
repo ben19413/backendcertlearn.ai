@@ -85,3 +85,20 @@ class CreateQuestionSetRequest(BaseModel):
 class QuestionSetResponse(BaseModel):
     question_set_id: int
     questions: list[Question]
+
+class LearningMaterialRequest(BaseModel):
+    """Request model for learning material generation."""
+    exam: ExamType = Field(..., description="Type of exam")
+    topic: CFA1Topic = Field(..., description="Topic within the exam")
+
+class Specification(BaseModel):
+    """Model for a learning specification."""
+    id: Optional[int] = None
+    exam: str
+    topic: str
+    specification: str
+    created_at: Optional[datetime] = None
+
+class LearningMaterialResponse(BaseModel):
+    """Response model for learning material generation."""
+    specification: Specification

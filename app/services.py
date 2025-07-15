@@ -2,14 +2,14 @@ import asyncio
 from pathlib import Path
 from typing import Dict, Any
 import aiofiles
-from models import QuestionDB, QuestionSetDB, AnswerLogDB
+import os
+from models import QuestionDB, QuestionSetDB, AnswerLogDB, SpecificationDB
 from schemas import QuestionRequest, QuestionResponse, ErrorResponse, ExamType, InProgressSetsResponse, Question, CreateQuestionSetRequest, QuestionSetResponse
 from gemini import GeminiClient
 from sqlalchemy import create_engine
 import sqlalchemy as sa
 from sqlalchemy.orm import sessionmaker
 from question_repository import QuestionRepository, AnswerLogRepository, OpinionLogRepository
-import os
 
 
 class QuestionGeneratorService:
@@ -284,6 +284,46 @@ class OpinionLogService:
         )
         db.close()
         return log_entry
+
+
+class LearningMaterialService(QuestionGeneratorService):
+    """Service class for generating and managing learning materials."""
+    
+    async def generate_learning_material(self, exam: str, topic: str):
+        """Generate learning materials for a specific exam and topic."""
+        try:
+            # Use the inherited _load_exam_pdf method
+            pdf_bytes = await self._load_exam_pdf(ExamType(exam), topic)
+            specification = await self.gemini_client.generate_learning_material_async(pdf_bytes)
+            
+            # Store in database
+            db = SessionLocal()
+            
+            spec_entry = SpecificationDB(
+                exam=exam,
+                topic=topic,
+                specification=specification
+            )
+            db.add(spec_entry)
+            db.commit()
+            db.refresh(spec_entry)
+            db.close()
+            
+            return spec_entry
+            
+        except Exception as e:
+            raise RuntimeError(f"Failed to generate learning material: {e}")
+    
+    def get_specification(self, exam: str, topic: str):
+        """Get existing learning material specification."""
+        db = SessionLocal()
+        
+        spec = db.query(SpecificationDB).filter(
+            SpecificationDB.exam == exam,
+            SpecificationDB.topic == topic
+        ).first()
+        db.close()
+        return spec
 
 
 DATABASE_URL = os.getenv("DATABASE_URL", "mssql+pyodbc://sa:YourStrong!Passw0rd@mssql:1433/master?driver=ODBC+Driver+17+for+SQL+Server")

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, func
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, func, Text
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -40,4 +40,12 @@ class QuestionSetDB(Base):
     question_set_id = Column(Integer, nullable=False)
     question_id = Column(Integer, ForeignKey("questions.id"), nullable=False)
     user_email = Column(String(255), nullable=False)
+
+class SpecificationDB(Base):
+    __tablename__ = "specifications"
+    id = Column(Integer, primary_key=True)
+    exam = Column(String(50), nullable=False)
+    topic = Column(String(255), nullable=False)
+    specification = Column(Text, nullable=False)
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
 

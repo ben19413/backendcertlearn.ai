@@ -5,7 +5,7 @@ from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 import logging
 from contextlib import asynccontextmanager
-from routers import questions
+from routers import questions, learning_materials, learning_materials
 
 # Configure logging
 logging.basicConfig(
@@ -41,6 +41,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(questions.router)
+app.include_router(learning_materials.router)
 
 
 @app.exception_handler(RequestValidationError)
